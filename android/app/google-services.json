@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "83888971190",
+    "project_id": "movieplay-2940b",
+    "storage_bucket": "movieplay-2940b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83888971190:android:2b6e5f99d954497f143517",
+        "android_client_info": {
+          "package_name": "com.movieplay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83888971190-cflaneq0j2fbldp57b0h0ans7scot1na.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.movieplay",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "83888971190-q1rulevq9a9abj9854pr3djvg2gfcsci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.movieplay",
+            "certificate_hash": "4273097dca14fa07921f27ba43ecb394d3f62efb"
+          }
+        },
+        {
+          "client_id": "83888971190-er9vlfe5u4t76rjlir4u15lacfj4v4r1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6bedIgD-wHlvhlTO_58LWfbyAgMGJzj4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83888971190-er9vlfe5u4t76rjlir4u15lacfj4v4r1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
