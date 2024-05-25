@@ -19,7 +19,7 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size, focused }) => {
+        tabBarIcon: ({ color, focused }) => {
           let iconName = '';
           switch (route.name) {
             case 'Home':
@@ -32,15 +32,17 @@ const BottomTabNavigator = () => {
               iconName = 'person-outline';
               break;
           }
+          const size = focused ? 30 : 28;
           color = focused ? '#CCC8C8' : '#FF4B3A';
 
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarShowLabel: false,
         tabBarStyle: {
-          borderTopColor: 'gray', // Color de la línea superior
-          borderTopWidth: 1, // Ancho de la línea superior
+          borderTopColor: 'gray', 
+          borderTopWidth: 2, 
           backgroundColor: '#2D1F1F',
+          height: 65
         },
       })}
     >
