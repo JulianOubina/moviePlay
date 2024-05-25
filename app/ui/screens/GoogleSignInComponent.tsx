@@ -22,7 +22,7 @@ export const GoogleSignInComponent = () => {
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
       setUser(auth().currentUser);
-      navigation.navigate('Home'); // Navegar a Home después de iniciar sesión
+      navigation.navigate('Home'); 
     } catch (error) {
       console.log("Error detectado en el sign in: ", error);
     }

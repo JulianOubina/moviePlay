@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { GoogleSignInComponent, UserContext } from './screens/GoogleSignInComponent';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { Home } from './screens/Home';
+import BottomTabNavigator from './components/BottomTabNavigator';
 
 export type RootStackParamList = {
   SignIn: undefined;
@@ -35,18 +35,20 @@ const App = () => {
     <UserContext.Provider value={currentUser}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="SignIn">
-          {currentUser ? (
-            <Stack.Screen
-              name="Home"
-              component={Home}
-              options={{ headerShown: false }} // Oculta el encabezado
-            />
-          ) : (
+          {/* Pantalla de inicio de sesión */}
+          {!currentUser ? (
             <Stack.Screen
               name="SignIn"
               component={GoogleSignInComponent}
-              options={{ headerShown: false }} // Oculta el encabezado
+              options={{ headerShown: false }}
             />
+          ) : (
+            // Pantalla Home con BottomTabNavigator embebido
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
+              {() => (
+                <BottomTabNavigator /> 
+              )}
+            </Stack.Screen>
           )}
         </Stack.Navigator>
       </NavigationContainer>
