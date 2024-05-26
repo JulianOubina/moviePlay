@@ -1,15 +1,17 @@
-import { StyleSheet, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { GoogleSignInComponent, UserContext } from './screens/GoogleSignInComponent';
+import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { Login, UserContext } from '../ui/screens/Login';
+import Profile from '../ui/screens/Profile'; // Asegúrate de que la ruta es correcta
 import BottomTabNavigator from './components/BottomTabNavigator';
 
 export type RootStackParamList = {
-  SignIn: undefined;
+  Login: undefined;
   Home: undefined;
+  Profile: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -34,22 +36,22 @@ const App = () => {
   return (
     <UserContext.Provider value={currentUser}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="SignIn">
-          {/* Pantalla de inicio de sesión */}
-          {!currentUser ? (
-            <Stack.Screen
-              name="SignIn"
-              component={GoogleSignInComponent}
-              options={{ headerShown: false }}
-            />
-          ) : (
-            // Pantalla Home con BottomTabNavigator embebido
-            <Stack.Screen name="Home" options={{ headerShown: false }}>
-              {() => (
-                <BottomTabNavigator /> 
-              )}
-            </Stack.Screen>
-          )}
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Home"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{ headerShown: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>

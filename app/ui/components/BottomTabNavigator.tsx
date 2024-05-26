@@ -48,7 +48,7 @@ const BottomTabNavigator = () => {
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Favourites" component={Favourites} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
     </Tab.Navigator>
   );
 };

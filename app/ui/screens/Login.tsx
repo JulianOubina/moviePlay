@@ -11,7 +11,7 @@ GoogleSignin.configure({
 
 export const UserContext = React.createContext<FirebaseAuthTypes.User | null>(null);
 
-export const GoogleSignInComponent = () => {
+export const Login = () => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
@@ -25,16 +25,6 @@ export const GoogleSignInComponent = () => {
       navigation.navigate('Home'); 
     } catch (error) {
       console.log("Error detectado en el sign in: ", error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await GoogleSignin.revokeAccess();
-      setUser(null);
-      console.log("User Logged Out");
-    } catch (error) {
-      console.log("Error detectado en el sign out: ", error);
     }
   };
 
@@ -55,9 +45,6 @@ export const GoogleSignInComponent = () => {
               />
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>
-            {user && (
-              <Button title="Sign Out" onPress={handleSignOut} color="#DB4437" />
-            )}
           </View>
         </View>
       </UserContext.Provider>
