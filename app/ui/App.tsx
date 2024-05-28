@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
-import Profile from '../ui/screens/Profile'; // Asegúrate de que la ruta es correcta
+import Profile from '../ui/screens/Profile'; 
 import BottomTabNavigator from './components/BottomTabNavigator';
 
 export type RootStackParamList = {

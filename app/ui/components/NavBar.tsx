@@ -31,17 +31,18 @@ const NavBar = () => {
 
 const styles = StyleSheet.create({
     navBarContainer: {
-      backgroundColor: '#332222', // Color de fondo oscuro
+      backgroundColor: '#2D1F1F', 
       padding: 15,
-      borderRadius: 30, // Bordes redondeados
+      borderRadius: 30, 
       marginHorizontal: -15,
+      paddingBottom: -2,
     },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: 'black', // Color de fondo de la barra de búsqueda
-      borderRadius: 25, // Bordes redondeados para la barra de búsqueda
-      paddingHorizontal: 15, // Espacio horizontal interno
+      backgroundColor: 'black', 
+      borderRadius: 25, 
+      paddingHorizontal: 15, 
       marginHorizontal: 10,
     },
     searchInputContainer: {

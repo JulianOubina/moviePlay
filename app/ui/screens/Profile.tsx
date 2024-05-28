@@ -16,7 +16,7 @@ const Profile: React.FC = () => {
       await GoogleSignin.signOut();
       await auth().signOut();
       Alert.alert('Signed out', 'You have been signed out successfully.');
-      navigation.navigate('Login'); // Redirige a la pantalla de inicio de sesión
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error(error);
       Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
@@ -61,7 +61,7 @@ const Profile: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2D1F1F',
+    backgroundColor: '#332222',
     alignItems: 'center',
     padding: 20,
   },
