@@ -22,9 +22,9 @@ const NavBar = () => {
             placeholder="Search..."
             value={searchText}
             onChangeText={setSearchText}
-            onSubmitEditing={handleSearchSubmit} // Navegar al presionar Enter
+            onSubmitEditing={handleSearchSubmit}
             placeholderTextColor="#95A5A6"
-            editable={true} // Asegúrate de que esto sea editable
+            editable={true} 
           />
         </View>
         <TouchableOpacity onPress={handleSearchSubmit} style={styles.filterButton}>

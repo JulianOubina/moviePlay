@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
 import Profile from '../ui/screens/Profile'; 
-import BottomTabNavigator from './components/BottomTabNavigator';
+import BottomTabNavigator from '../navigation/BottomTabNavigator';
 import Search from './screens/Search';
 
 export type RootStackParamList = {

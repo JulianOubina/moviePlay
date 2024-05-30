@@ -13,6 +13,7 @@ export const UserContext = React.createContext<FirebaseAuthTypes.User | null>(nu
 
 export const Login = () => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [jwt, setJwt] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
   const handleGoogleSignin = async () => {
@@ -21,8 +22,15 @@ export const Login = () => {
       const { idToken } = await GoogleSignin.signIn(); 
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
-      setUser(auth().currentUser);
-      navigation.navigate('Home'); 
+      
+      const firebaseUser = auth().currentUser;
+      if (firebaseUser) {
+        const token = await firebaseUser.getIdToken(); // Obtener el JWT
+        console.log("Firebase JWT: ", token); // Hacer console.log del JWT
+        setJwt(token); // Guardar el JWT en el estado
+        setUser(firebaseUser); // Guardar el usuario en el estado
+        navigation.navigate('Home'); // Navegar a la pantalla de inicio
+      }
     } catch (error) {
       console.log("Error detectado en el sign in: ", error);
     }
