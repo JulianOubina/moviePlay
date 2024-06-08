@@ -5,6 +5,8 @@ import auth from '@react-native-firebase/auth';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../App';
 import { UserContext } from './Login';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile: React.FC = () => {
   const user = useContext(UserContext);
@@ -12,9 +14,28 @@ const Profile: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      // Obtener el token de acceso
+      const token = await AsyncStorage.getItem('accessToken');
+      
+      // Verificar si el token existe antes de hacer la solicitud
+      if (token) {
+        // Hacer una solicitud DELETE al endpoint con el token en el encabezado
+        await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
+          headers: {
+            'googleId': token,
+          }
+        });
+      }
+
+      // Revocar acceso y cerrar sesión en Google
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
       await auth().signOut();
+
+      // Limpiar los tokens almacenados
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+
       Alert.alert('Signed out', 'You have been signed out successfully.');
       navigation.navigate('Login'); 
     } catch (error) {
@@ -23,23 +44,60 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      // Obtener el token de acceso
+      const token = await AsyncStorage.getItem('accessToken');
+
+      // Verificar si el token existe antes de hacer la solicitud
+      if (token) {
+        // Hacer una solicitud DELETE al endpoint con el token como parámetro de consulta
+        await axios.delete('https://dai-movieapp-api.onrender.com/users/me', {
+          params: {
+            googleId: token,
+          }
+        });
+      }
+
+      // Revocar acceso y cerrar sesión en Google
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      await auth().signOut();
+
+      // Limpiar los tokens almacenados
+      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('refreshToken');
+
+      Alert.alert('Account Deleted', 'Your account has been deleted successfully.');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Account Deletion Failed', 'Failed to delete the account. Please try again.');
+    }
+  };
+
+  // Dividir el displayName en nombre y apellido
+  const displayName = user?.displayName || '';
+  const [firstName, ...lastNameParts] = displayName.split(' ');
+  const lastName = lastNameParts.join(' ');
+
   return (
     <View style={styles.container}>
       <View style={styles.profilePictureContainer}>
         <Image
-          source={require('../../assets/images/profile.png')} 
           style={styles.profilePicture}
+          source={{ uri: user?.photoURL }} // Agregar la foto del usuario si está disponible
         />
       </View>
 
-      <View style={[styles.textContainer, styles.buttonsContainer]}> 
-        <Text style={styles.name}>John</Text>
+      <View style={[styles.textContainer, styles.buttonsContainer]}>
+        <Text style={styles.name}>{firstName}</Text>
         <View style={styles.underline} />
 
-        <Text style={styles.lastName}>Rubertson</Text>
+        <Text style={styles.lastName}>{lastName}</Text>
         <View style={styles.underline} />
 
-        <Text style={styles.username}>JR</Text>
+        <Text style={styles.username}>{user?.email}</Text>
         <View style={styles.underline} />
       </View>
 
@@ -50,7 +108,7 @@ const Profile: React.FC = () => {
         <TouchableOpacity style={styles.button} onPress={handleSignOut}>
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
           <Text style={styles.buttonText}>Delete Account</Text>
         </TouchableOpacity>
       </View>
