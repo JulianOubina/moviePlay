@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Profile: undefined;
+  MovieDetail: { movieId: string };
   Search: { searchQuery: string };
 };
 

@@ -14,26 +14,22 @@ const Profile: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-      // Obtener el token de acceso
-      const token = await AsyncStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('sessionToken');
       
-      // Verificar si el token existe antes de hacer la solicitud
-      if (token) {
-        // Hacer una solicitud DELETE al endpoint con el token en el encabezado
+      if (token && user?.uid) {
         await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
           headers: {
-            'googleId': token,
+            'Authorization': `Bearer ${token}`,
+            'googleId': user.uid,
           }
         });
       }
 
-      // Revocar acceso y cerrar sesión en Google
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
       await auth().signOut();
 
-      // Limpiar los tokens almacenados
-      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('sessionToken');
       await AsyncStorage.removeItem('refreshToken');
 
       Alert.alert('Signed out', 'You have been signed out successfully.');
@@ -46,26 +42,23 @@ const Profile: React.FC = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      // Obtener el token de acceso
-      const token = await AsyncStorage.getItem('accessToken');
-
-      // Verificar si el token existe antes de hacer la solicitud
-      if (token) {
-        // Hacer una solicitud DELETE al endpoint con el token como parámetro de consulta
+      const token = await AsyncStorage.getItem('sessionToken');
+      console.log(user?.uid);
+      if (token && user?.uid) {
+        
         await axios.delete('https://dai-movieapp-api.onrender.com/users/me', {
-          params: {
-            googleId: token,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'googleId': user.uid,
           }
         });
       }
 
-      // Revocar acceso y cerrar sesión en Google
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
       await auth().signOut();
 
-      // Limpiar los tokens almacenados
-      await AsyncStorage.removeItem('accessToken');
+      await AsyncStorage.removeItem('sessionToken');
       await AsyncStorage.removeItem('refreshToken');
 
       Alert.alert('Account Deleted', 'Your account has been deleted successfully.');
@@ -76,7 +69,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  // Dividir el displayName en nombre y apellido
   const displayName = user?.displayName || '';
   const [firstName, ...lastNameParts] = displayName.split(' ');
   const lastName = lastNameParts.join(' ');
@@ -86,7 +78,7 @@ const Profile: React.FC = () => {
       <View style={styles.profilePictureContainer}>
         <Image
           style={styles.profilePicture}
-          source={{ uri: user?.photoURL }} // Agregar la foto del usuario si está disponible
+          source={{ uri: user?.photoURL }} 
         />
       </View>
 
