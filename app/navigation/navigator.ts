@@ -5,6 +5,7 @@ export const navigator = {
     Favourites: "Favourites",
     MovieDetail: "MovieDetail",
     Search: "Search",
+    EditProfile: "EditProfile",
 } as const;
 
 export type RootStackParamList = {
@@ -14,4 +15,5 @@ export type RootStackParamList = {
     Favourites: undefined;
     MovieDetail: { movieId: string };
     Search: { searchQuery: string };
+    EditProfile: undefined;
 };

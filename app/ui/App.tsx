@@ -7,15 +7,10 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
 import Profile from '../ui/screens/Profile'; 
 import BottomTabNavigator from '../navigation/BottomTabNavigator';
-import Search from './screens/Search';
-
-export type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-  Profile: undefined;
-  MovieDetail: { movieId: string };
-  Search: { searchQuery: string };
-};
+import SearchScreen from '../ui/screens/Search'; // Ajusta la ruta según tu estructura de carpetas
+import MovieDetailScreen from '../ui/screens/MovieDetail'; // Ajusta la ruta según tu estructura de carpetas
+import EditProfile from './screens/EditProfile';
+import { RootStackParamList } from '../navigation/navigator';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -41,24 +36,38 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator>
           {currentUser ? (
-          <Stack.Screen
-          name="Home"
-          component={BottomTabNavigator}
-          options={{ headerShown: false }}
-        />
-        ) : (
             <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
+              name="Home"
+              component={BottomTabNavigator}
+              options={{ headerShown: false }}
+            />
+          ) : (
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{ headerShown: false }}
+            />
           )}
           <Stack.Screen
             name="Profile"
             component={Profile}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="Search" component={Search} />
+          <Stack.Screen
+            name="Search"
+            component={SearchScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MovieDetail"
+            component={MovieDetailScreen}
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{ headerShown: false }} 
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>

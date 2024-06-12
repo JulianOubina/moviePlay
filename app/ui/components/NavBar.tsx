@@ -6,6 +6,7 @@ import { RootStackParamList } from '../App'; // Importa los tipos de navegación
 
 const NavBar = () => {
   const [searchText, setSearchText] = useState('');
+  const [boolSearch, setBoolSearch] = useState(false)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {

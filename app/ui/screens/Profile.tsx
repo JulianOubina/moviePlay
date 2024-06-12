@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-na
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,6 +69,10 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleEditProfile = () => {
+    navigation.navigate('EditProfile');
+  };
+
   const displayName = user?.displayName || '';
   const [firstName, ...lastNameParts] = displayName.split(' ');
   const lastName = lastNameParts.join(' ');
@@ -94,7 +98,7 @@ const Profile: React.FC = () => {
       </View>
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleEditProfile}>
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleSignOut}>
