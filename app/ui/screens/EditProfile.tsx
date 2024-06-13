@@ -20,20 +20,6 @@ const EditProfile: React.FC = () => {
   const [lastName, setLastName] = useState(names.slice(1).join(' '));
   const [nick, setNick] = useState(user?.nick || '');
   const [selectImage, setSelectedImage] = useState(user?.image || '');
-  //const [base64Image, setBase64Image] = useState<string | null>(null);
-  
-  // const handleProfileImage = async () => {
-  //   let options = {
-  //     storageOptions: {
-  //       path: 'image',
-  //     },
-  //   }
-
-  //   launchImageLibrary(options, response=>{
-  //     setSelectedImage(response.assets[0].uri)
-  //     console.log(response.assets[0].uri)
-  //   })
-  // };
 
   const handleProfileImage = async () => {
     let options = {
