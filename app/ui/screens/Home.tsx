@@ -2,11 +2,13 @@ import React from "react";
 import { View, StyleSheet } from 'react-native';
 import NavBar from "../components/NavBar";
 
+
 function Home() {
   return (
     <View style={styles.container}>
       <NavBar />
     </View>
+
   );
 }
 

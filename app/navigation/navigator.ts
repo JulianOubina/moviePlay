@@ -6,6 +6,7 @@ export const navigator = {
     MovieDetail: "MovieDetail",
     Search: "Search",
     EditProfile: "EditProfile",
+    BottomTabNavigator: "BottomTabNavigator",
 } as const;
 
 export type RootStackParamList = {
@@ -16,4 +17,6 @@ export type RootStackParamList = {
     MovieDetail: { movieId: string };
     Search: { searchQuery: string };
     EditProfile: undefined;
+    BottomTabNavigator: undefined;
 };
+

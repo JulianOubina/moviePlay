@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
 import Home from '../ui/screens/Home';
 import Favourites from '../ui/screens/Favourites';
 import Profile from '../ui/screens/Profile';
-
 import Icon from 'react-native-vector-icons/Ionicons';
-import { navigator } from './navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -49,9 +46,10 @@ const BottomTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name={navigator.Home} component={Home} options={{ headerShown: false }}/>
-      <Tab.Screen name={navigator.Favourites} component={Favourites} options={{ headerShown: false }}/>
-      <Tab.Screen name={navigator.Profile} component={Profile} options={{ headerShown: false }}/>
+      <Tab.Screen name={'Home'} component={Home} options={{ headerShown: false }}/>
+      <Tab.Screen name={'Favourites'} component={Favourites} options={{ headerShown: false }}/>
+      <Tab.Screen name={'Profile'} component={Profile} options={{ headerShown: false }}/>
+
     </Tab.Navigator>
   );
 };

@@ -3,7 +3,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Button, ImageBackground, StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../../navigation/navigator';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

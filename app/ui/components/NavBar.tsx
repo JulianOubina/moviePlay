@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../App'; // Importa los tipos de navegación
+import { RootStackParamList } from '../../navigation/navigator'; 
 
 const NavBar = () => {
   const [searchText, setSearchText] = useState('');
@@ -10,7 +10,7 @@ const NavBar = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {
-    navigation.navigate('Search', { searchQuery: searchText });
+    navigation.navigate('Search', { searchQuery: searchText});
   };
 
   return (
@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 30, 
     marginHorizontal: -15,
+    marginVertical: -2,
     paddingBottom: -2,
   },
   searchContainer: {

@@ -5,12 +5,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
+
 import Profile from '../ui/screens/Profile'; 
-import BottomTabNavigator from '../navigation/BottomTabNavigator';
-import SearchScreen from '../ui/screens/Search'; // Ajusta la ruta según tu estructura de carpetas
-import MovieDetailScreen from '../ui/screens/MovieDetail'; // Ajusta la ruta según tu estructura de carpetas
+import Home from './screens/Home';
 import EditProfile from './screens/EditProfile';
+import BottomTabNavigator from '../navigation/BottomTabNavigator';
+import SearchScreen from '../ui/screens/Search'; 
+import MovieDetailScreen from '../ui/screens/MovieDetail'; 
+
 import { RootStackParamList } from '../navigation/navigator';
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -68,9 +72,18 @@ const App = () => {
             component={EditProfile}
             options={{ headerShown: false }} 
           />
+          <Stack.Screen
+            name="BottomTabNavigator"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }} 
+          />
+
+
         </Stack.Navigator>
+
       </NavigationContainer>
     </UserContext.Provider>
+    
   );
 };
 

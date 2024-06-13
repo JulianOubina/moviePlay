@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
@@ -7,10 +7,53 @@ import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BottomTabNavigator from '../../navigation/BottomTabNavigator';
 
 const Profile: React.FC = () => {
   const user = useContext(UserContext);
+  console.log(user)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const [firstName, setFirstName] = useState();
+  const [lastName, setLastName] = useState();
+  const [nick, setNick] = useState();
+  const [profileImage, setProfileImage] = useState();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const sessionToken = await AsyncStorage.getItem('sessionToken');
+      
+      if (!sessionToken) {
+        throw new Error('Session token not found');
+      }
+
+      const currentUser = auth().currentUser;
+  
+      const response = await axios.get('https://dai-movieapp-api.onrender.com/users/me', {
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+          googleId: user?.uid
+        }
+      });
+  
+      console.log('User Data:', response.data);
+      
+      const [firstNameSeparator, ...lastNameParts] = response.data.fullName.split(' ');
+      
+      
+      setFirstName(firstNameSeparator);
+      setLastName(lastNameParts.join(' '));
+      setNick(response.data.nick);
+      setProfileImage(response.data.image);
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }    
+  };
 
   const handleSignOut = async () => {
     try {
@@ -43,7 +86,7 @@ const Profile: React.FC = () => {
   const handleDeleteAccount = async () => {
     try {
       const token = await AsyncStorage.getItem('sessionToken');
-      console.log(user?.uid);
+
       if (token && user?.uid) {
         
         await axios.delete('https://dai-movieapp-api.onrender.com/users/me', {
@@ -73,16 +116,16 @@ const Profile: React.FC = () => {
     navigation.navigate('EditProfile');
   };
 
-  const displayName = user?.displayName || '';
-  const [firstName, ...lastNameParts] = displayName.split(' ');
-  const lastName = lastNameParts.join(' ');
+  //const displayName = user?.displayName || '';
+  //const [firstName, ...lastNameParts] = displayName.split(' ');
+  //const lastName = lastNameParts.join(' ');
 
   return (
     <View style={styles.container}>
       <View style={styles.profilePictureContainer}>
         <Image
           style={styles.profilePicture}
-          source={{ uri: user?.photoURL }} 
+          source={{ uri: "data:image/jpeg;base64,"+profileImage }} 
         />
       </View>
 
@@ -93,7 +136,7 @@ const Profile: React.FC = () => {
         <Text style={styles.lastName}>{lastName}</Text>
         <View style={styles.underline} />
 
-        <Text style={styles.username}>{user?.email}</Text>
+        <Text style={styles.username}>{nick}</Text>
         <View style={styles.underline} />
       </View>
 
