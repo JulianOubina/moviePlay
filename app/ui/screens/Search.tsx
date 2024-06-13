@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useContext} from 'react';
+import { UserContext } from './Login';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
@@ -29,17 +30,16 @@ type Movie = {
 
 const SearchScreen = ({ route }: Props) => {
   const { searchQuery } = route.params;
+  const user = useContext(UserContext);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
-  //let page = 1 
 
   useEffect(() => {
     setMovies([]);
     setPage(1);
     console.log("PASO POR USE EFFECT");
-    //page = 1
     setLoading(true);
     fetchMovies(1);
   }, [searchQuery]);
@@ -62,7 +62,6 @@ const SearchScreen = ({ route }: Props) => {
       
       setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
       setPage(pageNumber + 1);
-      //page = page + 1
       setLoading(false);
       
     } catch (error:any) {
@@ -100,38 +99,38 @@ const SearchScreen = ({ route }: Props) => {
         return;
     } catch (err:any) {
         console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-        // ACA TIENE QUE ESTAR EL LOG OUT
+        handleSignOut()
         return;
     }
 }
 
-// const handleSignOut = async () => {
-//   try {
-//     const token = await AsyncStorage.getItem('sessionToken');
+ const handleSignOut = async () => {
+   try {
+     const token = await AsyncStorage.getItem('sessionToken');
     
-//     if (token && user?.uid) {
-//       await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'googleId': user.uid,
-//         }
-//       });
-//     }
+     if (token && user?.uid) {
+       await axios.delete('https:dai-movieapp-api.onrender.com/auth', {
+         headers: {
+           'Authorization': `Bearer ${token}`,
+           'googleId': user.uid,
+         }
+       });
+     }
 
-//     await GoogleSignin.revokeAccess();
-//     await GoogleSignin.signOut();
-//     await auth().signOut();
+     await GoogleSignin.revokeAccess();
+     await GoogleSignin.signOut();
+     await auth().signOut();
 
-//     await AsyncStorage.removeItem('sessionToken');
-//     await AsyncStorage.removeItem('refreshToken');
+     await AsyncStorage.removeItem('sessionToken');
+     await AsyncStorage.removeItem('refreshToken');
 
-//     Alert.alert('Signed out', 'You have been signed out successfully.');
-//     navigation.navigate('Login'); 
-//   } catch (error) {
-//     console.error(error);
-//     Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-//   }
-// };
+     Alert.alert('Signed out', 'You have been signed out successfully.');
+     navigation.navigate('Login'); 
+   } catch (error) {
+     console.error(error);
+     Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
+   }
+ };
 
 
   const renderFooter = () => {

@@ -6,6 +6,7 @@ import { UserContext } from './Login';
 import axios from 'axios';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFS from 'react-native-fs';
 
 
 const EditProfile: React.FC = () => {
@@ -19,18 +20,49 @@ const EditProfile: React.FC = () => {
   const [lastName, setLastName] = useState(names.slice(1).join(' '));
   const [nick, setNick] = useState(user?.nick || '');
   const [selectImage, setSelectedImage] = useState(user?.image || '');
+  //const [base64Image, setBase64Image] = useState<string | null>(null);
+  
+  // const handleProfileImage = async () => {
+  //   let options = {
+  //     storageOptions: {
+  //       path: 'image',
+  //     },
+  //   }
+
+  //   launchImageLibrary(options, response=>{
+  //     setSelectedImage(response.assets[0].uri)
+  //     console.log(response.assets[0].uri)
+  //   })
+  // };
 
   const handleProfileImage = async () => {
     let options = {
-      storageOptions: {
-        path: 'image',
-      },
-    }
+      mediaType: 'photo',
+      quality: 1,
+      includeBase64: false,
+    };
 
-    launchImageLibrary(options, response=>{
-      setSelectedImage(response.assets[0].uri)
-      console.log(response.assets[0].uri)
-    })
+    launchImageLibrary(options, async response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        if (response.assets && response.assets.length > 0) {
+          const selectedAsset = response.assets[0];
+          if (selectedAsset.uri) {
+            setSelectedImage(selectedAsset.uri);
+
+            try {
+              const base64String = await RNFS.readFile(selectedAsset.uri, 'base64');
+              setSelectedImage(base64String);
+            } catch (error) {
+              console.error('Error converting image to base64: ', error);
+            }
+          }
+        }
+      }
+    });
   };
 
   const handleUpdateUser = async () => {
@@ -45,7 +77,7 @@ const EditProfile: React.FC = () => {
         image: selectImage
       };
   
-      const response = await axios.put('https://dai-movieapp-api.onrender.com/users/me', {body: payload}, {
+      const response = await axios.put('https://dai-movieapp-api.onrender.com/users/me', payload , {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
         }        
@@ -54,7 +86,7 @@ const EditProfile: React.FC = () => {
       // const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
       //   headers: {
       //       'sessionToken': session,
-      //       'refreshToken': refresh
+      //       'refreshToken': refreshW
       //   },
       // });
 
@@ -73,7 +105,7 @@ const EditProfile: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.profilePictureContainer}>
         <TouchableOpacity onPress={handleProfileImage}>
-          <Image style={styles.profilePicture} source={{ uri: user?.photoURL }} />
+          <Image style={styles.profilePicture} source={{ uri: "data:image/jpeg;base64," + selectImage }} />
         </TouchableOpacity>
       </View>
 
