@@ -16,7 +16,7 @@ export type RootStackParamList = {
     Favourites: undefined;
     MovieDetail: { movieId: string };
     Search: { searchQuery: string };
-    EditProfile: undefined;
+    EditProfile: { userFirstName:string, userLastName:string, userNick:string, userImage:string };
     BottomTabNavigator: undefined;
 };
 

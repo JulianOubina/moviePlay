@@ -106,14 +106,53 @@ const Profile: React.FC = () => {
 
       Alert.alert('Account Deleted', 'Your account has been deleted successfully.');
       navigation.navigate('Login');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Account Deletion Failed', 'Failed to delete the account. Please try again.');
+    } catch (error:any) {
+      switch(error.response.status){
+        case 403:
+          console.error("JWT VENCIDO");
+          await getNewTokens();
+          handleDeleteAccount();
+          break;
+        default:
+          console.log(error);
+          break;
+      }
     }
+    
   };
+  
+  const getNewTokens = async () => {
+    const refresh = await AsyncStorage.getItem('refreshToken');
+    const session = await AsyncStorage.getItem('sessionToken');
+    console.log(refresh, session)
+    try {
+        const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
+            headers: {
+                'sessionToken': session,
+                'refreshToken': refresh
+            },
+        });
+
+        console.log(response.data);
+
+        await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
+        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+        return;
+    } catch (err:any) {
+        console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
+        handleSignOut()
+        return;
+    }
+}
+
 
   const handleEditProfile = () => {
-    navigation.navigate('EditProfile');
+    navigation.navigate('EditProfile', {
+      userFirstName:firstName?firstName:"",
+      userLastName:lastName?lastName:"",
+      userNick:nick?nick:"",
+      userImage:profileImage?profileImage:""
+    });
   };
 
   //const displayName = user?.displayName || '';
