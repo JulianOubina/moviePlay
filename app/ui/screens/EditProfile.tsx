@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput } from 'react-native';
-import { RouteProp, useNavigation, NavigationProp , useRoute} from '@react-navigation/native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
@@ -18,12 +18,7 @@ const EditProfile = ({ route }: Props) => {
   const user = useContext(UserContext);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const displayName = user?.displayName || '';
-  const names = displayName.split(' ');
-
-  console.log(route);
-  console.log(route.params);
-  const {userFirstName, userLastName, userNick, userImage} = route.params;
+  const { userFirstName, userLastName, userNick, userImage } = route.params;
   
   const [firstName, setFirstName] = useState(userFirstName);
   const [lastName, setLastName] = useState(userLastName);
@@ -61,6 +56,11 @@ const EditProfile = ({ route }: Props) => {
   };
 
   const handleUpdateUser = async () => {
+    if (!firstName || !lastName || !nick) {
+      Alert.alert('Error', 'All fields must be filled out.');
+      return;
+    }
+
     try {
       const sessionToken = await AsyncStorage.getItem('sessionToken');
       
@@ -72,20 +72,20 @@ const EditProfile = ({ route }: Props) => {
         image: selectImage
       };
   
-      const response = await axios.put('https://dai-movieapp-api.onrender.com/users/me', payload , {
+      const response = await axios.put('https://dai-movieapp-api.onrender.com/users/me', payload, {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
-        }        
-      }, );
+        }
+      });
 
       console.log('User Data:', response.data);
       handleRollback();
-    } catch (error:any) {
-      switch(error.response.status){
+    } catch (error: any) {
+      switch (error.response.status) {
         case 403:
           console.error("JWT VENCIDO");
           await getNewTokens();
-          handleUpdateUser(pageNumber);
+          handleUpdateUser();
           break;
         default:
           console.log(error);
@@ -93,59 +93,59 @@ const EditProfile = ({ route }: Props) => {
       }
     }
   };
-  
+
   const getNewTokens = async () => {
     const refresh = await AsyncStorage.getItem('refreshToken');
     const session = await AsyncStorage.getItem('sessionToken');
     console.log(refresh, session)
     try {
-        const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-            headers: {
-                'sessionToken': session,
-                'refreshToken': refresh
-            },
-        });
+      const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
+        headers: {
+          'sessionToken': session,
+          'refreshToken': refresh
+        },
+      });
 
-        console.log(response.data);
-        
-        await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-        return;
-    } catch (err:any) {
-        console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-        handleSignOut()
-        return;
+      console.log(response.data);
+
+      await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
+      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+      return;
+    } catch (err: any) {
+      console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
+      handleSignOut()
+      return;
     }
-}
+  }
 
- const handleSignOut = async () => {
-   try {
-     const token = await AsyncStorage.getItem('sessionToken');
-    
-     if (token && user?.uid) {
-       await axios.delete('https:dai-movieapp-api.onrender.com/auth', {
-         headers: {
-           'Authorization': `Bearer ${token}`,
-           'googleId': user.uid,
-         }
-       });
-     }
+  const handleSignOut = async () => {
+    try {
+      const token = await AsyncStorage.getItem('sessionToken');
 
-     await GoogleSignin.revokeAccess();
-     await GoogleSignin.signOut();
-     await auth().signOut();
+      if (token && user?.uid) {
+        await axios.delete('https:dai-movieapp-api.onrender.com/auth', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'googleId': user.uid,
+          }
+        });
+      }
 
-     await AsyncStorage.removeItem('sessionToken');
-     await AsyncStorage.removeItem('refreshToken');
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      await auth().signOut();
 
-     Alert.alert('Signed out', 'You have been signed out successfully.');
-     navigation.navigate('Login'); 
-   } catch (error) {
-     console.error(error);
-     Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-   }
- };
-  
+      await AsyncStorage.removeItem('sessionToken');
+      await AsyncStorage.removeItem('refreshToken');
+
+      Alert.alert('Signed out', 'You have been signed out successfully.');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
+    }
+  };
+
   const handleRollback = () => {
     navigation.navigate('BottomTabNavigator');
   }
