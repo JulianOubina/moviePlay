@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ToastAndroid, ScrollView } from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,7 +7,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
 
-type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'>;
+type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'> & {
+  params: {
+    movieId: string;
+    posterImage: string;
+  };
+};
 
 type Props = {
   route: MovieDetailRouteProp;
@@ -28,11 +33,11 @@ type Movie = {
   ratingCount: number;
   duration: number;
   trailer: string;
-  sharelink: string;
+  shareLink: string;
 };
 
 const MovieDetailScreen = ({ route }: Props) => {
-  const { movieId } = route.params;
+  const { movieId, posterImage } = route.params;
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -44,8 +49,8 @@ const MovieDetailScreen = ({ route }: Props) => {
 
         const response = await axios.get(`https://dai-movieapp-api.onrender.com/movies/${movieId}`, {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         setMovie(response.data);
@@ -65,8 +70,8 @@ const MovieDetailScreen = ({ route }: Props) => {
 
   const handleShare = async () => {
     try {
-      if (movie?.sharelink) {
-        await Share.open({ url: movie.sharelink });
+      if (movie?.shareLink) {
+        await Share.open({ url: movie.shareLink });
         showToast('Link copied to clipboard!');
       } else {
         showToast('No share link available.');
@@ -104,7 +109,7 @@ const MovieDetailScreen = ({ route }: Props) => {
       <View style={styles.movieContainer}>
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: movie.images.length > 0 ? movie.images[0] : undefined }}
+            source={{ uri: posterImage }}
             style={styles.image}
           />
           <View style={styles.buttonContainer}>
@@ -116,7 +121,7 @@ const MovieDetailScreen = ({ route }: Props) => {
             </View>
             <View style={styles.buttonWrapper}>
               <TouchableOpacity style={styles.button}>
-                <Icon name="heart" size={25} color="#FF4B3A" />
+                <Icon name="heart-outline" size={25} color="#FF4B3A" />
               </TouchableOpacity>
               <Text style={styles.buttonText}>Fav</Text>
             </View>
@@ -157,10 +162,14 @@ const MovieDetailScreen = ({ route }: Props) => {
       <View style={styles.sinopsisContainer}>
         <Text style={styles.sinopsis}>{movie.sinopsis}</Text>
       </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
+        {movie.images.slice(1).map((image, index) => (
+          <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+        ))}
+      </ScrollView>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -270,8 +279,8 @@ const styles = StyleSheet.create({
   },
   directorContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 10,
+    alignItems: 'center',
+    marginTop: 15,
   },
   directorLabel: {
     fontSize: 15,
@@ -283,11 +292,23 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   sinopsisContainer: {
-    marginTop: 60,
-  },
+    flex: 1,
+    marginTop: 180,
+  },  
   sinopsis: {
     fontSize: 15,
     color: '#F0F0F0',
+    flex: 1,
+  },
+  imagesScroll: {
+    marginTop: 20,
+  },
+  additionalImage: {
+    width: 150,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 10,
+    resizeMode: 'cover',
   },
   buttonContainer: {
     marginTop: 10,

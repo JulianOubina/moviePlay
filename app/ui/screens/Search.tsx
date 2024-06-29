@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useContext} from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from './Login';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NavBar from '../components/NavBar'; 
+import NavBar from '../components/NavBar';
 import Icon from 'react-native-vector-icons/Ionicons';
 import BottomTabNavigator from '../../navigation/BottomTabNavigator';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -39,12 +39,11 @@ const SearchScreen = ({ route }: Props) => {
   useEffect(() => {
     setMovies([]);
     setPage(1);
-    console.log("PASO POR USE EFFECT");
     setLoading(true);
     fetchMovies(1);
   }, [searchQuery]);
 
-  const fetchMovies = async (pageNumber:any) => {
+  const fetchMovies = async (pageNumber: any) => {
     try {
       const token = await AsyncStorage.getItem('sessionToken');
 
@@ -57,17 +56,13 @@ const SearchScreen = ({ route }: Props) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      console.log(searchQuery);
-      console.log(page);
-      
+
       setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
       setPage(pageNumber + 1);
       setLoading(false);
-      
-    } catch (error:any) {
-      switch(error.response.status){
+    } catch (error: any) {
+      switch (error.response.status) {
         case 403:
-          console.error("JWT VENCIDO");
           await getNewTokens();
           fetchMovies(pageNumber);
           break;
@@ -77,61 +72,57 @@ const SearchScreen = ({ route }: Props) => {
       }
       setLoading(false);
     }
-    
   };
-  
+
   const getNewTokens = async () => {
     const refresh = await AsyncStorage.getItem('refreshToken');
     const session = await AsyncStorage.getItem('sessionToken');
-    console.log(refresh, session)
+
     try {
-        const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-            headers: {
-                'sessionToken': session,
-                'refreshToken': refresh
-            },
-        });
+      const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
+        headers: {
+          'sessionToken': session,
+          'refreshToken': refresh,
+        },
+      });
 
-        console.log(response.data);
-
-        await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-        return;
-    } catch (err:any) {
-        console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-        handleSignOut()
-        return;
+      await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
+      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+      return;
+    } catch (err: any) {
+      console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
+      handleSignOut();
+      return;
     }
-}
+  };
 
- const handleSignOut = async () => {
-   try {
-     const token = await AsyncStorage.getItem('sessionToken');
-    
-     if (token && user?.uid) {
-       await axios.delete('https:dai-movieapp-api.onrender.com/auth', {
-         headers: {
-           'Authorization': `Bearer ${token}`,
-           'googleId': user.uid,
-         }
-       });
-     }
+  const handleSignOut = async () => {
+    try {
+      const token = await AsyncStorage.getItem('sessionToken');
 
-     await GoogleSignin.revokeAccess();
-     await GoogleSignin.signOut();
-     await auth().signOut();
+      if (token && user?.uid) {
+        await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'googleId': user.uid,
+          },
+        });
+      }
 
-     await AsyncStorage.removeItem('sessionToken');
-     await AsyncStorage.removeItem('refreshToken');
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      await auth().signOut();
 
-     Alert.alert('Signed out', 'You have been signed out successfully.');
-     navigation.navigate('Login'); 
-   } catch (error) {
-     console.error(error);
-     Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-   }
- };
+      await AsyncStorage.removeItem('sessionToken');
+      await AsyncStorage.removeItem('refreshToken');
 
+      Alert.alert('Signed out', 'You have been signed out successfully.');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
+    }
+  };
 
   const renderFooter = () => {
     if (!loading) return null;
@@ -168,26 +159,26 @@ const SearchScreen = ({ route }: Props) => {
           renderItem={({ item }) => {
             const releaseYear = new Date(item.releaseDate).getFullYear();
             const genres = item.genres.join(' - ');
+
             return (
               <TouchableOpacity
                 style={styles.resultItem}
-                onPress={() => navigation.navigate('MovieDetail', { movieId: item.idMovie })}
+                onPress={() => navigation.navigate('MovieDetail', {
+                  movieId: item.idMovie,
+                  posterImage: item.images
+                })}
               >
-
-                  <Image
-                    source={{ uri: item.images }}
-                    style={styles.image}
-                  />
-                
+                <Image
+                  source={{ uri: item.images }}
+                  style={styles.image}
+                />
                 <View style={styles.textContainer}>
                   <Text style={styles.title}>{item.title} {item.subtitle} ({releaseYear})</Text>
-                  <Text></Text>
                   <View style={styles.ratingContainer}>
                     <Icon name="star" size={15} color="#FFD700" />
                     <Text style={styles.rating}> {item.rating} </Text>
                   </View>
-                  <Text></Text>
-                  <Text style={styles.releaseDate}> {genres}</Text>
+                  <Text style={styles.releaseDate}>{genres}</Text>
                 </View>
               </TouchableOpacity>
             );
@@ -198,7 +189,6 @@ const SearchScreen = ({ route }: Props) => {
           contentContainerStyle={styles.listContentContainer}
         />
       </View>
-
     </View>
   );
 };
@@ -218,7 +208,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     marginVertical: -17,
-    marginHorizontal: -20
+    marginHorizontal: -20,
   },
   text: {
     fontSize: 18,
@@ -237,7 +227,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 150,
     borderRadius: 15,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   textContainer: {
     flex: 1,
@@ -249,10 +239,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#ccc',
-  },
   rating: {
     fontSize: 14,
     color: '#ccc',
@@ -262,15 +248,12 @@ const styles = StyleSheet.create({
     color: '#ccc',
   },
   listContentContainer: {
-    paddingBottom: 80, 
+    paddingBottom: 80,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  tabNavigator: {
-
-  }
 });
 
 export default SearchScreen;
