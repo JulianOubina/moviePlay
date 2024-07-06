@@ -16,22 +16,23 @@ export const UserContext = React.createContext<FirebaseAuthTypes.User | null>(nu
 export const Login = () => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [jwt, setJwt] = useState<string | null>(null);
+  const [isLogged, setisLogged] = useState<boolean>(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleGoogleSignin = async () => {
     try {
+      setisLogged(false);
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const { idToken } = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
-      
+
       const firebaseUser = auth().currentUser;
       if (firebaseUser) {
-        const token = await firebaseUser.getIdToken(); 
-        console.log("Firebase JWT: ", token); 
-        setJwt(token); 
-        setUser(firebaseUser); 
-        
+        const token = await firebaseUser.getIdToken();
+        setJwt(token);
+        setUser(firebaseUser);
+
         try {
           const response = await axios.post('https://dai-movieapp-api.onrender.com/auth', {}, {
             headers: {
@@ -42,12 +43,14 @@ export const Login = () => {
 
           if (response.status === 200) {
             const { sessionToken, refreshToken } = response.data;
-            console.log('Backend response:', response.data);
-
+            
             await AsyncStorage.setItem('sessionToken', sessionToken);
             await AsyncStorage.setItem('refreshToken', refreshToken);
 
-            navigation.navigate('Home'); 
+            console.log('Backend response:', response.data);
+
+            navigation.navigate('Home');
+            setisLogged(true);
           } else {
             console.log('Error al autenticar con el backend:', response.statusText);
           }
@@ -66,14 +69,14 @@ export const Login = () => {
         <View style={styles.container}>
           <Image source={require('../../assets/images/moviePlay.png')} style={styles.logo} />
           <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={styles.googleButton} 
-              onPress={handleGoogleSignin} 
+            <TouchableOpacity
+              style={styles.googleButton}
+              onPress={handleGoogleSignin}
               disabled={user != null}
             >
-              <Image 
-                source={require('../../assets/images/google_logo.png')} 
-                style={styles.googleLogo} 
+              <Image
+                source={require('../../assets/images/google_logo.png')}
+                style={styles.googleLogo}
               />
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>

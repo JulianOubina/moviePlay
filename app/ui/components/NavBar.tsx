@@ -1,16 +1,30 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Modal, Text, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../navigation/navigator'; 
+import { RootStackParamList } from '../../navigation/navigator';
 
 const NavBar = () => {
   const [searchText, setSearchText] = useState('');
-  const [boolSearch, setBoolSearch] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {
-    navigation.navigate('Search', { searchQuery: searchText});
+    navigation.navigate('Search', { searchQuery: searchText });
+  };
+
+  const handleFilter = () => {
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleFilterApply = () => {
+    // For simplicity, let's just close the modal. You can add filter logic here.
+    setIsModalVisible(false);
+    // Example: navigation.navigate('Search', { searchQuery: searchText, filters: selectedFilters });
   };
 
   return (
@@ -25,23 +39,55 @@ const NavBar = () => {
             onChangeText={setSearchText}
             onSubmitEditing={handleSearchSubmit}
             placeholderTextColor="#95A5A6"
-            editable={true} 
+            editable={true}
           />
         </View>
-        <TouchableOpacity onPress={handleSearchSubmit} style={styles.filterButton}>
+        <TouchableOpacity onPress={handleFilter} style={styles.filterButton}>
           <Icon name="filter" size={24} color="#E74C3C" />
         </TouchableOpacity>
       </View>
       <View style={styles.divider} />
+      
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={closeModal}
+        animationType="slide"
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select Filters</Text>
+            <View style={styles.filterOptions}>
+              <TouchableOpacity style={styles.filterButtonOption}>
+                <Text style={styles.filterText}>Filter 1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.filterButtonOption}>
+                <Text style={styles.filterText}>Filter 2</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.filterButtonOption}>
+                <Text style={styles.filterText}>Filter 3</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={handleFilterApply}>
+                <Text style={styles.modalButtonText}>Apply Filters</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   navBarContainer: {
-    backgroundColor: '#2D1F1F', 
+    backgroundColor: '#2D1F1F',
     padding: 15,
-    borderRadius: 30, 
+    borderRadius: 30,
     marginHorizontal: -15,
     marginVertical: -2,
     paddingBottom: -2,
@@ -49,9 +95,9 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'black', 
-    borderRadius: 25, 
-    paddingHorizontal: 15, 
+    backgroundColor: 'black',
+    borderRadius: 25,
+    paddingHorizontal: 15,
     marginHorizontal: 10,
   },
   searchInputContainer: {
@@ -76,6 +122,55 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'gray',
     marginTop: 15,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  filterOptions: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  filterButtonOption: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#E74C3C',
+    borderRadius: 5,
+  },
+  filterText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    padding: 10,
+    margin: 5,
+    backgroundColor: '#E74C3C',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

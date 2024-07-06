@@ -188,6 +188,7 @@ const SearchScreen = ({ route }: Props) => {
           ListFooterComponent={renderFooter}
           contentContainerStyle={styles.listContentContainer}
         />
+        
       </View>
     </View>
   );

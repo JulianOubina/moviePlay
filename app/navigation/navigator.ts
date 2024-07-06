@@ -7,6 +7,7 @@ export const navigator = {
     Search: "Search",
     EditProfile: "EditProfile",
     BottomTabNavigator: "BottomTabNavigator",
+    Filter: "Filter",
 } as const;
 
 export type RootStackParamList = {
@@ -18,5 +19,6 @@ export type RootStackParamList = {
     Search: { searchQuery: string };
     EditProfile: { userFirstName:string, userLastName:string, userNick:string, userImage:string };
     BottomTabNavigator: undefined;
+    Filter: undefined;
 };
 

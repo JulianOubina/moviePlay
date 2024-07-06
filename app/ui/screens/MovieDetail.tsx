@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ToastAndroid, ScrollView } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ToastAndroid, ScrollView, Modal } from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
+import { UserContext } from './Login';
 
 type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'> & {
   params: {
@@ -19,13 +20,12 @@ type Props = {
 };
 
 type Movie = {
-  idMovie: string;
+  id: string;
   title: string;
   subtitle: string;
   genres: string[];
   releaseDate: string;
   rating: number;
-  adult: boolean;
   images: string[];
   cast: string[];
   sinopsis: string;
@@ -34,33 +34,40 @@ type Movie = {
   duration: number;
   trailer: string;
   shareLink: string;
+  userFavorite: boolean;
+  userRating: number;
 };
 
 const MovieDetailScreen = ({ route }: Props) => {
+  const user = useContext(UserContext);
   const { movieId, posterImage } = route.params;
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [selectedRating, setSelectedRating] = useState<number | null>(movie?.userRating ?? null);
   const navigation = useNavigation();
 
+  const fetchMovieDetails = async () => {
+    try {
+      const token = await AsyncStorage.getItem('sessionToken');
+      const response = await axios.get<Movie>(`https://dai-movieapp-api.onrender.com/movies/${movieId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      setMovie(response.data);
+      setIsFavorite(response.data.userFavorite);
+      setSelectedRating(response.data.userRating); 
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching movie details:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchMovieDetails = async () => {
-      try {
-        const token = await AsyncStorage.getItem('sessionToken');
-
-        const response = await axios.get(`https://dai-movieapp-api.onrender.com/movies/${movieId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setMovie(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
-
     fetchMovieDetails();
   }, [movieId]);
 
@@ -78,6 +85,77 @@ const MovieDetailScreen = ({ route }: Props) => {
       }
     } catch (error) {
       console.error('Error sharing:', error.message);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    try {
+      const token = await AsyncStorage.getItem('sessionToken');
+      const body = {
+        googleId: user?.uid,
+        movie: movieId,
+      };
+  
+      let response;
+      if (isFavorite) {
+        response = await axios.delete(`https://dai-movieapp-api.onrender.com/favorites`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: body,
+        });
+        showToast('Removed from favorites!');
+      } else {
+        response = await axios.post(
+          `https://dai-movieapp-api.onrender.com/favorites`,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        showToast('Added to favorites!');
+      }
+  
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Error toggling favorite:', error.message);
+    }
+  };
+
+  const handleSelectRating = (rating: number) => {
+    setSelectedRating(rating);
+  };
+
+  const handleSubmitRating = async () => {
+    if (selectedRating) {
+      try {
+        const token = await AsyncStorage.getItem('sessionToken');
+        const body = {
+          movie: movieId,
+          rating: selectedRating,
+          googleId: user?.uid,
+        };
+
+        const response = await axios.post(
+          `https://dai-movieapp-api.onrender.com/rating`,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        showToast(`You rated this movie ${selectedRating} stars!`);
+        setRatingModalVisible(false);
+        fetchMovieDetails();
+      } catch (error) {
+        console.error('Error submitting rating:', error.message);
+      }
+    } else {
+      showToast('Please select a rating before submitting.');
     }
   };
 
@@ -102,229 +180,300 @@ const MovieDetailScreen = ({ route }: Props) => {
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="close" size={25} color="#E74C3C" />
-      </TouchableOpacity>
-      <View style={styles.movieContainer}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: posterImage }}
-            style={styles.image}
-          />
-          <View style={styles.buttonContainer}>
-            <View style={styles.buttonWrapper}>
-              <TouchableOpacity style={styles.button}>
-                <Icon name="star" size={25} color="#FFD700" />
-              </TouchableOpacity>
-              <Text style={styles.buttonText}>Rate</Text>
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Icon name="close" size={25} color="#E74C3C" />
+        </TouchableOpacity>
+        <View style={styles.movieContainer}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: posterImage }}
+              style={styles.image}
+            />
+            <View style={styles.buttonContainer}>
+              <View style={styles.buttonWrapper}>
+                <TouchableOpacity style={styles.button} onPress={() => setRatingModalVisible(true)}>
+                  <Icon name="star" size={25} color="#FFD700" />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Rate</Text>
+              </View>
+              <View style={styles.buttonWrapper}>
+                <TouchableOpacity style={styles.button} onPress={handleToggleFavorite}>
+                  {isFavorite ? (
+                    <Icon name="heart" size={25} color="#FF4B3A" />
+                  ) : (
+                    <Icon name="heart-outline" size={25} color="#FF4B3A" />
+                  )}
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Fav</Text>
+              </View>
+              <View style={styles.buttonWrapper}>
+                <TouchableOpacity style={styles.button} onPress={handleShare}>
+                  <Icon name="share" size={25} color="#0096E3" />
+                </TouchableOpacity>
+                <Text style={styles.buttonText}>Share</Text>
+              </View>
             </View>
-            <View style={styles.buttonWrapper}>
-              <TouchableOpacity style={styles.button}>
-                <Icon name="heart-outline" size={25} color="#FF4B3A" />
-              </TouchableOpacity>
-              <Text style={styles.buttonText}>Fav</Text>
+          </View>
+          <View style={styles.detailsContainer}>
+            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.subtitle}>{movie.subtitle}</Text>
+            <View style={styles.releaseDateContainer}>
+              <Text style={styles.releaseDate}>{getReleaseYear(movie.releaseDate)}</Text>
+              <Icon name="time-outline" size={15} color="rgba(240, 240, 240, 0.3)" style={styles.timeIcon} />
+              <Text style={styles.releaseDate}>{movie.duration} min</Text>
             </View>
-            <View style={styles.buttonWrapper}>
-              <TouchableOpacity style={styles.button} onPress={handleShare}>
-                <Icon name="share" size={25} color="#0096E3" />
-              </TouchableOpacity>
-              <Text style={styles.buttonText}>Share</Text>
+            <View style={styles.ratingContainer}>
+              <Icon name="star" size={20} color="#FFD700" />
+              <Text style={styles.rating}> {movie.rating} of {movie.ratingCount} views</Text>
+            </View>
+            <View style={styles.genresContainer}>
+              <Text style={styles.genresLabel}>Genres:</Text>
+              <Text style={styles.genres}>{movie.genres.join(', ')}</Text>
+            </View> 
+            <View style={styles.castContainer}>
+              <Text style={styles.castLabel}>Cast:</Text>
+              <Text style={styles.cast}>{movie.cast.join(', ')}</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+            <TouchableOpacity 
+            >
+              <Image 
+                source={require('../../assets/images/google_logo.png')} 
+              />
+              <Text>Continue with Google</Text>
+            </TouchableOpacity>
+          </View>
+            <View style={styles.directorContainer}>
+              <Text style={styles.directorLabel}>Director:</Text>
+              <Text style={styles.director}>{movie.director}</Text>
             </View>
           </View>
         </View>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.subtitle}>{movie.subtitle}</Text>
-          <View style={styles.releaseDateContainer}>
-            <Text style={styles.releaseDate}>{getReleaseYear(movie.releaseDate)}</Text>
-            <Icon name="time-outline" size={15} color="rgba(240, 240, 240, 0.3)" style={styles.timeIcon} />
-            <Text style={styles.releaseDate}>{movie.duration} min</Text>
-          </View>
-          <View style={styles.ratingContainer}>
-            <Icon name="star" size={20} color="#FFD700" />
-            <Text style={styles.rating}> {movie.rating} of {movie.ratingCount} views</Text>
-          </View>
-          <View style={styles.genresContainer}>
-            <Text style={styles.genresLabel}>Gender:</Text>
-            <Text style={styles.genres}>{movie.genres.join(', ')}</Text>
-          </View> 
-          <View style={styles.castContainer}>
-            <Text style={styles.castLabel}>Cast:</Text>
-            <Text style={styles.cast}>{movie.cast.join(', ')}</Text>
-          </View>
-          <View style={styles.directorContainer}>
-            <Text style={styles.directorLabel}>Director:</Text>
-            <Text style={styles.director}>{movie.director}</Text>
-          </View>
+        <View style={styles.sinopsisContainer}>
+          <Text style={styles.sinopsis}>{movie.sinopsis}</Text>
         </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
+          {movie.images.map((image, index) => (
+            <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+          ))}
+        </ScrollView>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={ratingModalVisible}
+          onRequestClose={() => setRatingModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Rate this movie</Text>
+              <View style={styles.ratingOptions}>
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <TouchableOpacity
+                    key={rating}
+                    onPress={() => handleSelectRating(rating)}
+                    style={[
+                      styles.ratingOption,
+                      selectedRating === rating && styles.selectedRatingOption,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.ratingOptionText,
+                        selectedRating === rating && styles.selectedRatingOptionText,
+                      ]}
+                    >
+                      {rating}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitRating}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
-      <View style={styles.sinopsisContainer}>
-        <Text style={styles.sinopsis}>{movie.sinopsis}</Text>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
-        {movie.images.slice(1).map((image, index) => (
-          <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
-        ))}
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#332222',
     padding: 20,
+    backgroundColor: '#2A2B2E',
   },
   backButton: {
-    position: 'absolute',
-    top: 10,
-    right: 20,
-    zIndex: 1,
-  },
-  loadingIndicator: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 18,
-    color: '#F0F0F0',
-    marginBottom: 20,
-    alignSelf: 'center',
-    marginTop: '50%',
+    alignSelf: 'flex-end',
   },
   movieContainer: {
-    flex: 1,
     flexDirection: 'row',
+    marginBottom: 20,
   },
   imageContainer: {
-    width: '45%',
-    alignItems: 'center',
-    marginTop: 30,
+    marginRight: 20,
   },
   image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 20,
-    resizeMode: 'cover',
+    width: 150,
+    height: 225,
+    borderRadius: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    marginLeft: 15
+  },
+  buttonWrapper: {
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  button: {
+    marginBottom: 5,
+  },
+  buttonText: {
+    color: 'rgba(240, 240, 240, 0.7)',
+    fontSize: 12,
   },
   detailsContainer: {
     flex: 1,
-    paddingLeft: 15,
-    paddingTop: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#F0F0F0',
-    marginTop: 20,
+    marginBottom: 5,
   },
   subtitle: {
-    fontSize: 15,
-    color: 'rgba(240, 240, 240, 0.3)',
-    marginTop: 5,
+    fontSize: 16,
+    color: 'rgba(240, 240, 240, 0.7)',
+    marginBottom: 10,
   },
   releaseDateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 15,
+    marginBottom: 10,
   },
   releaseDate: {
-    fontSize: 15,
-    color: 'rgba(240, 240, 240, 0.3)',
-    marginRight: 10,
+    fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
   },
   timeIcon: {
-    marginLeft: 10,
-    marginRight: 3,
-  },
-  genresContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  genresLabel: {
-    fontSize: 15,
-    color: 'rgba(240, 240, 240, 0.3)',
-  },
-  genres: {
-    fontSize: 15,
-    color: '#F0F0F0',
-    marginLeft: 5,
+    marginHorizontal: 5,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 15,
+    marginBottom: 10,
   },
   rating: {
     fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
+  },
+  genresContainer: {
+    marginBottom: 10,
+  },
+  genresLabel: {
+    fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
+  },
+  genres: {
+    fontSize: 14,
     color: '#F0F0F0',
-    marginLeft: 5,
   },
   castContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 15,
+    marginBottom: 10,
   },
   castLabel: {
-    fontSize: 15,
-    color: 'rgba(240, 240, 240, 0.3)',
+    fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
   },
   cast: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#F0F0F0',
-    marginLeft: 5,
   },
   directorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 15,
+    marginBottom: 10,
   },
   directorLabel: {
-    fontSize: 15,
-    color: 'rgba(240, 240, 240, 0.3)',
+    fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
   },
   director: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#F0F0F0',
-    marginLeft: 5,
   },
   sinopsisContainer: {
-    flex: 1,
-    marginTop: 180,
-  },  
+    marginVertical: 20,
+  },
   sinopsis: {
-    fontSize: 15,
-    color: '#F0F0F0',
-    flex: 1,
+    fontSize: 14,
+    color: 'rgba(240, 240, 240, 0.7)',
   },
   imagesScroll: {
-    marginTop: 20,
+    marginBottom: 20,
   },
   additionalImage: {
-    width: 150,
-    height: 100,
+    width: 200,
+    height: 180,
     borderRadius: 10,
     marginRight: 10,
-    resizeMode: 'cover',
   },
-  buttonContainer: {
-    marginTop: 10,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  ratingOptions: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '100%',
+    marginBottom: 20,
   },
-  buttonWrapper: {
-    alignItems: 'center',
+  ratingOption: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
   },
-  button: {
-    alignItems: 'center',
+  selectedRatingOption: {
+    backgroundColor: '#FFD700',
   },
-  buttonText: {
-    fontSize: 12,
-    color: 'rgba(240, 240, 240, 0.3)',
+  ratingOptionText: {
+    fontSize: 16,
+  },
+  selectedRatingOptionText: {
+    color: '#fff',
+  },
+  submitButton: {
+    backgroundColor: '#0096E3',
+    padding: 10,
+    borderRadius: 5,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

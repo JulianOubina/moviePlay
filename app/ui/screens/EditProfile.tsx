@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
+import { RouteProp, useNavigation, NavigationProp, CommonActions } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
@@ -147,8 +147,15 @@ const EditProfile = ({ route }: Props) => {
   };
 
   const handleRollback = () => {
-    navigation.navigate('BottomTabNavigator');
-  }
+    navigation.dispatch(
+      CommonActions.navigate({
+        name: 'BottomTabNavigator',
+        params: {
+          screen: 'Profile'
+        },
+      })
+    );
+  };
 
   return (
     <View style={styles.container}>
