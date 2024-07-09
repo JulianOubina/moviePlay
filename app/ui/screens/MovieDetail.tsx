@@ -5,6 +5,7 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { WebView } from 'react-native-webview'; // Importar WebView
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
 import { UserContext } from './Login';
@@ -34,6 +35,7 @@ type Movie = {
   ratingCount: number;
   duration: number;
   trailer: string;
+  trailer_id: string;
   shareLink: string;
   userFavorite: boolean;
   userRating: number;
@@ -266,6 +268,18 @@ const MovieDetailScreen = ({ route }: Props) => {
             <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
           ))}
         </ScrollView>
+        {/*
+          Ahora se tendria que poner abajo de las imagenes 
+          Se puede poner en un modal tambien con play = true 
+          Acordate de npm intall el react-native-youtube-iframe
+        */}
+        <View style={styles.videoPlayer}> 
+          <YoutubePlayer
+            height={300}
+            play={false}
+            videoId={movie.trailer_id} 
+          />
+        </View>
       </View>
       <Modal
         animationType="slide"
@@ -315,6 +329,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#332222',
+  },
+  videoPlayer:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backButton: {
     alignSelf: 'flex-end',
