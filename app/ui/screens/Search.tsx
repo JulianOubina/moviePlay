@@ -34,6 +34,7 @@ const SearchScreen = ({ route }: Props) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isOrder, setIsOrder] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -44,6 +45,9 @@ const SearchScreen = ({ route }: Props) => {
   }, [searchQuery]);
 
   const fetchMovies = async (pageNumber: any) => {
+    if (isOrder){
+      return;
+    }
     try {
       const token = await AsyncStorage.getItem('sessionToken');
 
@@ -132,6 +136,15 @@ const SearchScreen = ({ route }: Props) => {
       </View>
     );
   };
+
+  const sortMoviesByReleaseDate = (movies: Movie[]): Movie[] => {
+    return movies.slice().sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
+  };
+
+  const handleOrderMovies = () =>{  {/* Hay que ponerlo como onclick en algun lado */}
+    setIsOrder(true);
+    setMovies(sortMoviesByReleaseDate(movies))
+  }
 
   if (loading) {
     return (
