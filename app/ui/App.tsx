@@ -12,7 +12,7 @@ import EditProfile from './screens/EditProfile';
 import BottomTabNavigator from '../navigation/BottomTabNavigator';
 import SearchScreen from '../ui/screens/Search'; 
 import MovieDetailScreen from '../ui/screens/MovieDetail'; 
-
+import Trailer from '../ui/screens/Trailer';
 import { RootStackParamList } from '../navigation/navigator';
 
 
@@ -77,7 +77,11 @@ const App = () => {
             component={BottomTabNavigator}
             options={{ headerShown: false }} 
           />
-
+          <Stack.Screen
+            name="Trailer"
+            component={Trailer}
+            options={{ headerShown: false }} 
+          />
 
         </Stack.Navigator>
 

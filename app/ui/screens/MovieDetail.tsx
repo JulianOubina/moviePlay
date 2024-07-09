@@ -4,6 +4,7 @@ import axios from 'axios';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { WebView } from 'react-native-webview'; // Importar WebView
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
 import { UserContext } from './Login';
@@ -45,7 +46,7 @@ const MovieDetailScreen = ({ route }: Props) => {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [ratingModalVisible, setRatingModalVisible] = useState(false);
-  const [selectedRating, setSelectedRating] = useState<number | null>(movie?.userRating ?? null);
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const navigation = useNavigation();
 
   const fetchMovieDetails = async () => {
@@ -163,6 +164,15 @@ const MovieDetailScreen = ({ route }: Props) => {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   };
 
+  const handleWatchTrailer = () => {
+    if (movie?.trailer) {
+      console.log(movie.trailer);
+      navigation.navigate('Trailer', { trailer: movie.trailer });
+    } else {
+      showToast('No trailer available.');
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -215,6 +225,12 @@ const MovieDetailScreen = ({ route }: Props) => {
                 <Text style={styles.buttonText}>Share</Text>
               </View>
             </View>
+            <View style={styles.trailerButtonWrapper}>
+              <TouchableOpacity style={styles.trailerButton} onPress={handleWatchTrailer}>
+                <Icon name="play-circle-outline" size={35} color="#0096E3" />
+                <Text style={styles.trailerButtonText}>Watch Trailer</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.detailsContainer}>
             <Text style={styles.title}>{movie.title}</Text>
@@ -236,15 +252,6 @@ const MovieDetailScreen = ({ route }: Props) => {
               <Text style={styles.castLabel}>Cast:</Text>
               <Text style={styles.cast}>{movie.cast.join(', ')}</Text>
             </View>
-            <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-            >
-              <Image 
-                source={require('../../assets/images/google_logo.png')} 
-              />
-              <Text>Continue with Google</Text>
-            </TouchableOpacity>
-          </View>
             <View style={styles.directorContainer}>
               <Text style={styles.directorLabel}>Director:</Text>
               <Text style={styles.director}>{movie.director}</Text>
@@ -259,43 +266,43 @@ const MovieDetailScreen = ({ route }: Props) => {
             <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
           ))}
         </ScrollView>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={ratingModalVisible}
-          onRequestClose={() => setRatingModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Rate this movie</Text>
-              <View style={styles.ratingOptions}>
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <TouchableOpacity
-                    key={rating}
-                    onPress={() => handleSelectRating(rating)}
+      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={ratingModalVisible}
+        onRequestClose={() => setRatingModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Rate this movie</Text>
+            <View style={styles.ratingOptions}>
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <TouchableOpacity
+                  key={rating}
+                  onPress={() => handleSelectRating(rating)}
+                  style={[
+                    styles.ratingOption,
+                    selectedRating === rating && styles.selectedRatingOption,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.ratingOption,
-                      selectedRating === rating && styles.selectedRatingOption,
+                      styles.ratingOptionText,
+                      selectedRating === rating && styles.selectedRatingOptionText,
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.ratingOptionText,
-                        selectedRating === rating && styles.selectedRatingOptionText,
-                      ]}
-                    >
-                      {rating}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitRating}>
-                <Text style={styles.submitButtonText}>Submit</Text>
-              </TouchableOpacity>
+                    {rating}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmitRating}>
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -307,7 +314,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#2A2B2E',
+    backgroundColor: '#332222',
   },
   backButton: {
     alignSelf: 'flex-end',
@@ -337,6 +344,18 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   buttonText: {
+    color: 'rgba(240, 240, 240, 0.7)',
+    fontSize: 12,
+  },
+  trailerButtonWrapper: {
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  trailerButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trailerButtonText: {
     color: 'rgba(240, 240, 240, 0.7)',
     fontSize: 12,
   },
@@ -409,7 +428,7 @@ const styles = StyleSheet.create({
     color: '#F0F0F0',
   },
   sinopsisContainer: {
-    marginVertical: 20,
+    marginBottom: 30,
   },
   sinopsis: {
     fontSize: 14,

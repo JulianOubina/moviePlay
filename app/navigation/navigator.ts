@@ -8,6 +8,7 @@ export const navigator = {
     EditProfile: "EditProfile",
     BottomTabNavigator: "BottomTabNavigator",
     Filter: "Filter",
+    Trailer: "Trailer"
 } as const;
 
 export type RootStackParamList = {
@@ -15,10 +16,11 @@ export type RootStackParamList = {
     Home: undefined;
     Profile: undefined;
     Favourites: undefined;
-    MovieDetail: { movieId: string };
+    MovieDetail: { movieId: string, posterImage: string };
     Search: { searchQuery: string };
     EditProfile: { userFirstName:string, userLastName:string, userNick:string, userImage:string };
     BottomTabNavigator: undefined;
     Filter: undefined;
+    Trailer: { trailer: string};
 };
 
