@@ -35,7 +35,7 @@ type Movie = {
   ratingCount: number;
   duration: number;
   trailer: string;
-  trailer_id: string;
+  trailerId: string;
   shareLink: string;
   userFavorite: boolean;
   userRating: number;
@@ -167,9 +167,8 @@ const MovieDetailScreen = ({ route }: Props) => {
   };
 
   const handleWatchTrailer = () => {
-    if (movie?.trailer) {
-      console.log(movie.trailer);
-      navigation.navigate('Trailer', { trailer: movie.trailer });
+    if (movie?.trailerId) {
+      navigation.navigate('Trailer', { trailer: movie.trailerId });
     } else {
       showToast('No trailer available.');
     }
@@ -268,18 +267,6 @@ const MovieDetailScreen = ({ route }: Props) => {
             <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
           ))}
         </ScrollView>
-        {/*
-          Ahora se tendria que poner abajo de las imagenes 
-          Se puede poner en un modal tambien con play = true 
-          Acordate de npm intall el react-native-youtube-iframe
-        */}
-        <View style={styles.videoPlayer}> 
-          <YoutubePlayer
-            height={300}
-            play={false}
-            videoId={movie.trailer_id} 
-          />
-        </View>
       </View>
       <Modal
         animationType="slide"

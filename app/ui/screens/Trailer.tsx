@@ -1,24 +1,29 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 const Trailer = ({ route }) => {
   const { trailer } = route.params;
   const navigation = useNavigation();
-  const handleWatchTrailer = () => {
-    console.log(trailer);
-    Linking.openURL(trailer);
-  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
+
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Icon name="close" size={25} color="#E74C3C" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.watchButton} onPress={handleWatchTrailer}>
-        <Icon name="play-circle-outline" size={100} color="#0096E3" />
-      </TouchableOpacity>
+
+      <View style={styles.videoPlayer}>
+        <YoutubePlayer
+          height={300}
+          width={300}
+          play={false}
+          videoId={trailer}
+        />
+      </View>
+
     </View>
   );
 };
@@ -27,17 +32,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#332222',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  closeButton: {
+  backButton: {
     position: 'absolute',
     top: 20,
     right: 20,
+    zIndex: 1, // Asegura que el botón esté por encima del reproductor de video
   },
-  watchButton: {
-    alignItems: 'center',
+  videoPlayer: {
+    width: 300,
+    height: 300,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
