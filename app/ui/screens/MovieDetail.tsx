@@ -50,6 +50,8 @@ const MovieDetailScreen = ({ route }: Props) => {
   const [ratingModalVisible, setRatingModalVisible] = useState(false);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const navigation = useNavigation();
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fetchMovieDetails = async () => {
     try {
@@ -174,6 +176,16 @@ const MovieDetailScreen = ({ route }: Props) => {
     }
   };
 
+  const openImageModal = (image: string) => {
+    setSelectedImage(image);
+    setImageModalVisible(true);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+    setImageModalVisible(false);
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -268,6 +280,22 @@ const MovieDetailScreen = ({ route }: Props) => {
           ))}
         </ScrollView>
       </View>
+      <Modal
+          visible={imageModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={closeImageModal}
+        >
+          <View style={styles.modalContainer}>
+            <TouchableOpacity style={styles.closeModalButton} onPress={closeImageModal}>
+              <Icon name="close" size={30} color="#FFFFFF" />
+            </TouchableOpacity>
+            {selectedImage && (
+              <Image source={{ uri: selectedImage }} style={styles.fullscreenImage} />
+            )}
+          </View>
+      </Modal>
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -499,6 +527,16 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     flex: 1,
     justifyContent: 'center',
+  },
+  closeModalButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+  },
+  fullscreenImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });
 

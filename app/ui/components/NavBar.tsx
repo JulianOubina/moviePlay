@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Modal, Text, Button } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Modal, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 
-const NavBar = () => {
+const NavBar = ({ handleOrderMovies }) => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -22,9 +22,7 @@ const NavBar = () => {
   };
 
   const handleFilterApply = () => {
-    // For simplicity, let's just close the modal. You can add filter logic here.
     setIsModalVisible(false);
-    // Example: navigation.navigate('Search', { searchQuery: searchText, filters: selectedFilters });
   };
 
   return (
@@ -45,9 +43,13 @@ const NavBar = () => {
         <TouchableOpacity onPress={handleFilter} style={styles.filterButton}>
           <Icon name="filter" size={24} color="#E74C3C" />
         </TouchableOpacity>
+        {/* Botón de ordenamiento */}
+        <TouchableOpacity onPress={handleOrderMovies} style={styles.orderButton}>
+          <Icon name="arrow-up-circle" size={24} color="#E74C3C" />
+        </TouchableOpacity>
       </View>
       <View style={styles.divider} />
-      
+      {/* Modal para filtros */}
       <Modal
         transparent={true}
         visible={isModalVisible}
@@ -57,6 +59,7 @@ const NavBar = () => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Select Filters</Text>
+            {/* Aquí van las opciones de filtro */}
             <View style={styles.filterOptions}>
               <TouchableOpacity style={styles.filterButtonOption}>
                 <Text style={styles.filterText}>Filter 1</Text>
@@ -68,6 +71,7 @@ const NavBar = () => {
                 <Text style={styles.filterText}>Filter 3</Text>
               </TouchableOpacity>
             </View>
+            {/* Botones de modal */}
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
                 <Text style={styles.modalButtonText}>Cancel</Text>
@@ -115,6 +119,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   filterButton: {
+    padding: 12,
+    marginLeft: 10,
+  },
+  orderButton: {
     padding: 12,
     marginLeft: 10,
   },

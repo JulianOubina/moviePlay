@@ -25,18 +25,23 @@ const FavoritesScreen = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setMovies([]);
     setLoading(true);
-    fetchFavorites();
+    setPage(1);
+    fetchFavorites(1);
   }, []);
 
-  const fetchFavorites = async () => {
+  const fetchFavorites = async (pageNumber: any) => {
     try {
       const token = await AsyncStorage.getItem('sessionToken');
 
       const response = await axios.get('https://dai-movieapp-api.onrender.com/favorites', {
+        params: {
+          page: pageNumber,
+        },
         headers: {
           'Authorization': `Bearer ${token}`,
           googleId: user?.uid,
@@ -44,11 +49,8 @@ const FavoritesScreen = () => {
       });
 
       if (response.data && response.data.results) {
-        const favoriteIds = response.data.results;
-        const favoriteDetailsPromises = favoriteIds.map((idMovie: string) => fetchMovieDetails(idMovie, token));
-        const favoriteDetails = await Promise.all(favoriteDetailsPromises);
-
-        setMovies(favoriteDetails);
+        setMovies((prevMovies) => [...prevMovies, ...response.data.results]);
+        setPage(pageNumber + 1);
       } else {
         console.error('No se recibieron datos válidos de la API de favoritos:', response.data);
       }
@@ -57,7 +59,7 @@ const FavoritesScreen = () => {
     } catch (error: any) {
       if (error.response?.status === 403) {
         await getNewTokens();
-        fetchFavorites();
+        fetchFavorites(pageNumber);
       } else {
         console.error(error);
         setLoading(false);

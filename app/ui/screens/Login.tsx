@@ -31,7 +31,6 @@ export const Login = () => {
       if (firebaseUser) {
         const token = await firebaseUser.getIdToken();
         setJwt(token);
-        setUser(firebaseUser);
 
         try {
           const response = await axios.post('https://dai-movieapp-api.onrender.com/auth', {}, {
@@ -49,8 +48,7 @@ export const Login = () => {
 
             console.log('Backend response:', response.data);
 
-            navigation.navigate('Home');
-            setisLogged(true);
+            setUser(firebaseUser);
           } else {
             console.log('Error al autenticar con el backend:', response.statusText);
           }
