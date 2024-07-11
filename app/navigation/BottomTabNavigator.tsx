@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  
   useEffect(() => {
     Icon.loadFont().then(() => {
       console.log('Ionicons font loaded');
@@ -15,7 +16,7 @@ const BottomTabNavigator = () => {
       console.error('Error loading Ionicons font', error);
     });
   }, []);
-
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -47,7 +48,7 @@ const BottomTabNavigator = () => {
       })}
     >
       <Tab.Screen name={'Home'} component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name={'Favourites'} component={Favourites} options={{ headerShown: false }} />
+      <Tab.Screen name={'Favourites'} component={Favourites} options={{ headerShown: false }}/>
       <Tab.Screen name={'Profile'} component={Profile} options={{ headerShown: false }}/>
 
     </Tab.Navigator>

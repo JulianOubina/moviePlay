@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
+
 type Movie = {
   idMovie: string;
   title: string;
@@ -20,19 +21,29 @@ type Movie = {
   images: string;
 };
 
-const FavoritesScreen = () => {
+type Props = {
+  route: any; 
+};
+
+const FavoritesScreen: React.FC<Props> = ({ route }) => {
   const user = useContext(UserContext);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
+  const updateFavs = route.params.updateFavs
 
   useEffect(() => {
-    setMovies([]);
-    setLoading(true);
-    setPage(1);
-    fetchFavorites(1);
-  }, []);
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      setMovies([]);
+      setLoading(true);
+      setPage(1);
+      fetchFavorites(1);
+      console.log(route);
+    });
+  
+    return unsubscribeFocus;
+  }, [navigation]);
 
   const fetchFavorites = async (pageNumber: any) => {
     try {
