@@ -45,6 +45,7 @@ const App = () => {
   }, []);
 
   if (!isConnected) {
+    /* npm install @react-native-community/netinfo */
     return (
       <View style={styles.lockScreen}>
         <Text style={styles.lockScreenText}>No hay conexión a Internet</Text>
