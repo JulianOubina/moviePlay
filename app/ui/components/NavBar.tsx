@@ -4,13 +4,14 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 
-const NavBar = ({ handleOrderMovies }) => {
+const NavBar = () => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orderder, setIsOrderder] = useState<boolean>(false)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {
-    navigation.navigate('Search', { searchQuery: searchText });
+    navigation.navigate('Search', { searchQuery: searchText, ordered: orderder});
   };
 
   const handleFilter = () => {
@@ -24,6 +25,10 @@ const NavBar = ({ handleOrderMovies }) => {
   const handleFilterApply = () => {
     setIsModalVisible(false);
   };
+
+  const handleOrderMovies = () =>{
+    setIsOrderder(true)    
+  }
 
   return (
     <View style={styles.navBarContainer}>

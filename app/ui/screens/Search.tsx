@@ -7,7 +7,6 @@ import { RootStackParamList } from '../../navigation/navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/NavBar';
 import Icon from 'react-native-vector-icons/Ionicons';
-import BottomTabNavigator from '../../navigation/BottomTabNavigator';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
@@ -29,12 +28,11 @@ type Movie = {
 };
 
 const SearchScreen = ({ route }: Props) => {
-  const { searchQuery } = route.params;
+  const { searchQuery, ordered} = route.params;
   const user = useContext(UserContext);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [isOrder, setIsOrder] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -45,7 +43,9 @@ const SearchScreen = ({ route }: Props) => {
   }, [searchQuery]);
 
   const fetchMovies = async (pageNumber: any) => {
-    if (isOrder){
+    console.log(ordered);    
+    if (ordered){
+      handleOrderMovies();
       return;
     }
     try {
@@ -142,7 +142,6 @@ const SearchScreen = ({ route }: Props) => {
   };
 
   const handleOrderMovies = () =>{  {/* Hay que ponerlo como onclick en algun lado */}
-    setIsOrder(true);
     setMovies(sortMoviesByReleaseDate(movies))
   }
 

@@ -4,8 +4,6 @@ import axios from 'axios';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { WebView } from 'react-native-webview'; // Importar WebView
-import YoutubePlayer from 'react-native-youtube-iframe';
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
 import { UserContext } from './Login';
@@ -280,6 +278,7 @@ const MovieDetailScreen = ({ route }: Props) => {
           ))}
         </ScrollView>
       </View>
+      
       <Modal
           visible={imageModalVisible}
           transparent={true}
@@ -310,25 +309,24 @@ const MovieDetailScreen = ({ route }: Props) => {
                 <TouchableOpacity
                   key={rating}
                   onPress={() => handleSelectRating(rating)}
-                  style={[
-                    styles.ratingOption,
-                    selectedRating === rating && styles.selectedRatingOption,
-                  ]}
+                  style={styles.ratingOption}
                 >
-                  <Text
-                    style={[
-                      styles.ratingOptionText,
-                      selectedRating === rating && styles.selectedRatingOptionText,
-                    ]}
-                  >
-                    {rating}
-                  </Text>
+                  <Icon
+                    name="star"
+                    size={40}
+                    color={selectedRating >= rating ? '#FFD700' : 'gray'}
+                  />
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmitRating}>
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setRatingModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitRating}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -497,13 +495,11 @@ const styles = StyleSheet.create({
   ratingOptions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '80%',
     marginBottom: 20,
   },
   ratingOption: {
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
   },
   selectedRatingOption: {
@@ -519,10 +515,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#0096E3',
     padding: 10,
     borderRadius: 5,
+    flex: 1,
   },
   submitButtonText: {
     color: '#fff',
     fontSize: 16,
+    textAlign: 'center',
   },
   loadingIndicator: {
     flex: 1,
@@ -537,6 +535,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  cancelButton: {
+    backgroundColor: '#FF4B3A',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

@@ -31,7 +31,7 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
-  const updateFavs = route.params.updateFavs
+  //const updateFavs = route.params.updateFavs
 
   useEffect(() => {
     const unsubscribeFocus = navigation.addListener('focus', () => {
