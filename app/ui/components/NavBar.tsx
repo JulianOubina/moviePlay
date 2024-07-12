@@ -7,11 +7,10 @@ import { RootStackParamList } from '../../navigation/navigator';
 const NavBar = () => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [orderder, setIsOrderder] = useState<boolean>(false)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {
-    navigation.navigate('Search', { searchQuery: searchText, ordered: orderder});
+    navigation.navigate('Search', { searchQuery: searchText});
   };
 
   const handleFilter = () => {
@@ -25,10 +24,6 @@ const NavBar = () => {
   const handleFilterApply = () => {
     setIsModalVisible(false);
   };
-
-  const handleOrderMovies = () =>{
-    setIsOrderder(true)    
-  }
 
   return (
     <View style={styles.navBarContainer}>
@@ -48,10 +43,10 @@ const NavBar = () => {
         <TouchableOpacity onPress={handleFilter} style={styles.filterButton}>
           <Icon name="filter" size={24} color="#E74C3C" />
         </TouchableOpacity>
-        {/* Botón de ordenamiento */}
+        {/* Botón de ordenamiento
         <TouchableOpacity onPress={handleOrderMovies} style={styles.orderButton}>
           <Icon name="arrow-up-circle" size={24} color="#E74C3C" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={styles.divider} />
       {/* Modal para filtros */}

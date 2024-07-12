@@ -9,6 +9,7 @@ import NavBar from '../components/NavBar';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import ActionButtons from '../components/ActionButtons';
 
 type SearchRouteProp = RouteProp<RootStackParamList, 'Search'>;
 
@@ -28,23 +29,25 @@ type Movie = {
 };
 
 const SearchScreen = ({ route }: Props) => {
-  const { searchQuery, ordered} = route.params;
+  const { searchQuery } = route.params;
   const user = useContext(UserContext);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
+  const [isOrdered, setIsOrdered] = useState(false);
+
 
   useEffect(() => {
     setMovies([]);
     setPage(1);
     setLoading(true);
+    setIsOrdered(false);
     fetchMovies(1);
   }, [searchQuery]);
 
   const fetchMovies = async (pageNumber: any) => {
-    console.log(ordered);    
-    if (ordered){
+    if (isOrdered){
       handleOrderMovies();
       return;
     }
@@ -164,6 +167,7 @@ const SearchScreen = ({ route }: Props) => {
   return (
     <View style={styles.container}>
       <NavBar />
+      <ActionButtons setIsOrdered={setIsOrdered} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}
