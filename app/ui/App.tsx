@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -14,12 +14,13 @@ import SearchScreen from '../ui/screens/Search';
 import MovieDetailScreen from '../ui/screens/MovieDetail'; 
 import Trailer from '../ui/screens/Trailer';
 import { RootStackParamList } from '../navigation/navigator';
-
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(null);
+  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     const init = async () => {};
@@ -28,12 +29,28 @@ const App = () => {
       await SplashScreen.hide();
       console.log("Boot splash hidden");
     });
-
+    
     const subscriber = auth().onAuthStateChanged((user) => {
       setCurrentUser(user);
     });
-    return subscriber;
+    
+    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
+      setIsConnected(state.isConnected);
+    });
+    
+    return () => {
+      subscriber;
+      unsubscribe();
+    }    
   }, []);
+
+  if (!isConnected) {
+    return (
+      <View style={styles.lockScreen}>
+        <Text style={styles.lockScreenText}>No hay conexión a Internet</Text>
+      </View>
+    );
+  }
 
   return (
     <UserContext.Provider value={currentUser}>
@@ -84,7 +101,6 @@ const App = () => {
           />
 
         </Stack.Navigator>
-
       </NavigationContainer>
     </UserContext.Provider>
     
@@ -96,6 +112,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  lockScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red', // Color de fondo para la pantalla de bloqueo
+  },
+  lockScreenText: {
+    color: 'white', // Color del texto para la pantalla de bloqueo
+    fontSize: 20, // Tamaño del texto para la pantalla de bloqueo
   },
 });
 
