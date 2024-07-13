@@ -37,6 +37,15 @@ const SearchScreen = ({ route }: Props) => {
   const [page, setPage] = useState(1);
   const [isOrdered, setIsOrdered] = useState(false);
 
+  const generateRandomKey = () => {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 15; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
 
   useEffect(() => {
     setMovies([]);
@@ -48,7 +57,6 @@ const SearchScreen = ({ route }: Props) => {
 
   const fetchMovies = async (pageNumber: any) => {
     if (isOrdered){
-      handleOrderMovies();
       return;
     }
     try {
@@ -141,11 +149,14 @@ const SearchScreen = ({ route }: Props) => {
   };
 
   const sortMoviesByReleaseDate = (movies: Movie[]): Movie[] => {
-    return movies.slice().sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
+    return movies.slice().sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
   };
 
   const handleOrderMovies = () =>{  {/* Hay que ponerlo como onclick en algun lado */}
-    setMovies(sortMoviesByReleaseDate(movies))
+    const sortedMovies = sortMoviesByReleaseDate(movies);
+    setMovies([]); 
+    setMovies(sortedMovies); 
+    setIsOrdered(true);
   }
 
   if (loading) {
@@ -167,11 +178,11 @@ const SearchScreen = ({ route }: Props) => {
   return (
     <View style={styles.container}>
       <NavBar />
-      <ActionButtons setIsOrdered={setIsOrdered} />
+      <ActionButtons setIsOrdered={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}
-          keyExtractor={(item) => item.idMovie}
+          keyExtractor={() => generateRandomKey()}
           renderItem={({ item }) => {
             const releaseYear = new Date(item.releaseDate).getFullYear();
             const genres = item.genres.join(' - ');

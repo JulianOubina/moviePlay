@@ -40,17 +40,10 @@ const NavBar = () => {
             editable={true}
           />
         </View>
-        <TouchableOpacity onPress={handleFilter} style={styles.filterButton}>
-          <Icon name="filter" size={24} color="#E74C3C" />
-        </TouchableOpacity>
-        {/* Botón de ordenamiento
-        <TouchableOpacity onPress={handleOrderMovies} style={styles.orderButton}>
-          <Icon name="arrow-up-circle" size={24} color="#E74C3C" />
-        </TouchableOpacity> */}
       </View>
       <View style={styles.divider} />
       {/* Modal para filtros */}
-      <Modal
+      {/* <Modal
         transparent={true}
         visible={isModalVisible}
         onRequestClose={closeModal}
@@ -59,7 +52,7 @@ const NavBar = () => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Select Filters</Text>
-            {/* Aquí van las opciones de filtro */}
+            {/* Aquí van las opciones de filtro 
             <View style={styles.filterOptions}>
               <TouchableOpacity style={styles.filterButtonOption}>
                 <Text style={styles.filterText}>Filter 1</Text>
@@ -71,7 +64,7 @@ const NavBar = () => {
                 <Text style={styles.filterText}>Filter 3</Text>
               </TouchableOpacity>
             </View>
-            {/* Botones de modal */}
+            {/* Botones de modal 
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
                 <Text style={styles.modalButtonText}>Cancel</Text>
@@ -82,7 +75,7 @@ const NavBar = () => {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </View>
   );
 };
