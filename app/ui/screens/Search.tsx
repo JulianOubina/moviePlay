@@ -35,7 +35,11 @@ const SearchScreen = ({ route }: Props) => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
-  const [isOrdered, setIsOrdered] = useState(false);
+  const [isOrdered, setIsOrdered] = useState(0);
+
+  const ORDER_BY_DATE = 1;
+  const ORDER_BY_RATING = 2;
+  const ORDER_BY_BOTH = 3;
 
   const generateRandomKey = () => {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -51,7 +55,7 @@ const SearchScreen = ({ route }: Props) => {
     setMovies([]);
     setPage(1);
     setLoading(true);
-    setIsOrdered(false);
+    setIsOrdered(0);
     fetchMovies(1);
   }, [searchQuery]);
 
@@ -152,11 +156,34 @@ const SearchScreen = ({ route }: Props) => {
     return movies.slice().sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
   };
 
-  const handleOrderMovies = () =>{  {/* Hay que ponerlo como onclick en algun lado */}
-    const sortedMovies = sortMoviesByReleaseDate(movies);
-    setMovies([]); 
-    setMovies(sortedMovies); 
-    setIsOrdered(true);
+  const sortMoviesByRating = (movies: Movie[]): Movie[] => {
+    return movies.slice().sort((a, b) => b.rating - a.rating);
+  };
+
+  const sortMoviesByBoth = (movies: Movie[]): Movie[] => {
+    return movies.slice().sort((a, b) => {
+      if (new Date(a.releaseDate).getTime() === new Date(b.releaseDate).getTime()) {
+        return b.rating - a.rating;
+      }
+      return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+    });
+  };
+
+  const handleOrderMovies = (state:number) => {
+    switch (state) {
+      case ORDER_BY_DATE:
+        sortMoviesByReleaseDate(movies);
+        break;
+      case ORDER_BY_RATING:
+        sortMoviesByRating(movies);
+        break;
+      case ORDER_BY_BOTH:
+        sortMoviesByBoth(movies);
+        break;
+      default:
+        console.error("Error en el ordenamiento");
+        break;
+    }
   }
 
   if (loading) {
@@ -178,7 +205,7 @@ const SearchScreen = ({ route }: Props) => {
   return (
     <View style={styles.container}>
       <NavBar />
-      <ActionButtons setIsOrdered={handleOrderMovies} />
+      <ActionButtons isOrdered={isOrdered} setIsOrdered={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}
