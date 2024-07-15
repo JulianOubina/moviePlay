@@ -34,7 +34,7 @@ function ActionButtons({ isOrdered, setIsOrdered }: ActionButtonsProps) {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.filterButton}>
         <Icon name="funnel-outline" size={22} color="#E74C3C" />
       </TouchableOpacity>

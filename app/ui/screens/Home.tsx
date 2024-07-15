@@ -241,8 +241,8 @@ function Home() {
     }
   };
 
-  const handleMoviePress = (movie: Movie) => {
-    navigation.navigate('MovieDetail', { movieId: movie.idMovie, posterImage: movie.images });
+  const handleMoviePress = (movieId:string, posterImage:string) => {
+    navigation.navigate('MovieDetail', { movieId: movieId, posterImage: posterImage });
   };
 
   return (
@@ -252,6 +252,22 @@ function Home() {
         <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       ) : (
         <ScrollView>
+          <View style={styles.carouselContainer}>
+            <FlatList
+              data={carrouselPhotos}
+              keyExtractor={(item) => item.idMovie}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carrouselSection}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.image)}>
+                <View style={styles.imageContainer}>
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  </View>
+                </TouchableOpacity>
+              )} />
+          </View>
           <View style={styles.flatListSection}>
             <Text style={styles.title}>{genreTitles.genre1}</Text>
             <FlatList
@@ -261,7 +277,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
@@ -282,7 +298,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
@@ -303,7 +319,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
@@ -353,6 +369,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   carouselContainer: {
+    height: 250,
     width: '100%',
   },
   carrouselSection: {

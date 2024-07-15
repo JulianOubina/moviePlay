@@ -26,6 +26,7 @@ type Movie = {
   genres: string[];
   releaseDate: string;
   rating: number;
+  poster: string;
   images: string[];
   cast: string[];
   sinopsis: string;
@@ -209,7 +210,7 @@ const MovieDetailScreen = ({ route }: Props) => {
         <View style={styles.movieContainer}>
           <View style={styles.imageContainer}>
             <Image
-              source={{ uri: posterImage }}
+              source={movie.poster ? { uri: movie.poster } : { uri: posterImage }}
               style={styles.image}
             />
             <View style={styles.buttonContainer}>
