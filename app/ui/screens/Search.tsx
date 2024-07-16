@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import ActionButtons from '../components/ActionButtons';
+import { stat } from 'react-native-fs';
 
 type SearchRouteProp = RouteProp<RootStackParamList, 'Search'>;
 
@@ -37,9 +38,9 @@ const SearchScreen = ({ route }: Props) => {
   const [page, setPage] = useState(1);
   const [isOrdered, setIsOrdered] = useState(0);
 
-  const ORDER_BY_DATE = 1;
-  const ORDER_BY_RATING = 2;
-  const ORDER_BY_BOTH = 3;
+  const ORDER_BY_DATE:number = 1;
+  const ORDER_BY_RATING:number = 2;
+  const ORDER_BY_BOTH:number = 3;
 
   const generateRandomKey = () => {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -162,7 +163,7 @@ const SearchScreen = ({ route }: Props) => {
 
   const sortMoviesByBoth = (movies: Movie[]): Movie[] => {
     return movies.slice().sort((a, b) => {
-      if (new Date(a.releaseDate).getTime() === new Date(b.releaseDate).getTime()) {
+      if (new Date(a.releaseDate).getFullYear() === new Date(b.releaseDate).getFullYear()) {
         return b.rating - a.rating;
       }
       return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
@@ -170,22 +171,20 @@ const SearchScreen = ({ route }: Props) => {
   };
 
   const handleOrderMovies = () => {
-    isOrdered === ORDER_BY_BOTH ? setIsOrdered(ORDER_BY_DATE) : setIsOrdered(isOrdered + 1);
-    
-    switch (isOrdered) {
-      case ORDER_BY_DATE:
-        sortMoviesByReleaseDate(movies);
-        break;
-      case ORDER_BY_RATING:
-        sortMoviesByRating(movies);
-        break;
-      case ORDER_BY_BOTH:
-        sortMoviesByBoth(movies);
-        break;
-      default:
-        console.error("Error en el ordenamiento");
-        break;
+    const status = isOrdered === ORDER_BY_BOTH ? ORDER_BY_DATE : isOrdered + 1;
+    setIsOrdered(status);
+    let movieList: Movie[];
+    if(status === ORDER_BY_DATE){
+      movieList = sortMoviesByReleaseDate(movies);
+    }else if(status === ORDER_BY_RATING){
+      movieList = sortMoviesByRating(movies);
+    }else if(status === ORDER_BY_BOTH){
+      movieList = sortMoviesByBoth(movies);
+    }else{
+      movieList = movies;
+      console.error("Error en el ordenamiento");
     }
+    setMovies(movieList);
   }
 
   if (loading) {
