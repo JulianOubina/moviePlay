@@ -169,8 +169,10 @@ const SearchScreen = ({ route }: Props) => {
     });
   };
 
-  const handleOrderMovies = (state:number) => {
-    switch (state) {
+  const handleOrderMovies = () => {
+    isOrdered === ORDER_BY_BOTH ? setIsOrdered(ORDER_BY_DATE) : setIsOrdered(isOrdered + 1);
+    
+    switch (isOrdered) {
       case ORDER_BY_DATE:
         sortMoviesByReleaseDate(movies);
         break;
@@ -205,7 +207,7 @@ const SearchScreen = ({ route }: Props) => {
   return (
     <View style={styles.container}>
       <NavBar />
-      <ActionButtons isOrdered={isOrdered} setIsOrdered={handleOrderMovies} />
+      <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}

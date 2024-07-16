@@ -19,7 +19,7 @@ const Trailer = ({ route }) => {
         <YoutubePlayer
           height={300}
           width={300}
-          play={false}
+          play={true}
           videoId={trailer}
         />
       </View>

@@ -1,24 +1,22 @@
+import React, { useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 type ActionButtonsProps = {
-  setIsOrdered: (isOrdered: number) => void;
+  handleOrderMovies: () => void;
   isOrdered: number;
 };
 
-function ActionButtons({ isOrdered, setIsOrdered }: ActionButtonsProps) {
+function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
+  const [icon, setIcon] = React.useState<string>("filter");
+  
   const ORDER_BY_DATE = 1;
   const ORDER_BY_RATING = 2;
   const ORDER_BY_BOTH = 3;
-  
-  const toggleOrder = () => {
-    if (isOrdered === ORDER_BY_BOTH) {
-      setIsOrdered(ORDER_BY_DATE);
-    }
-    else {
-      setIsOrdered(isOrdered + 1);
-    }
-  };
+
+  useEffect(() => {
+    setIcon(getIcon());
+  }, [isOrdered]);
 
   const getIcon = () => {
     switch (isOrdered) {
@@ -38,8 +36,8 @@ function ActionButtons({ isOrdered, setIsOrdered }: ActionButtonsProps) {
       <TouchableOpacity style={styles.filterButton}>
         <Icon name="funnel-outline" size={22} color="#E74C3C" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.orderButton} onPress={toggleOrder}>
-        <Icon name={getIcon()} size={22} color="#E74C3C" />
+      <TouchableOpacity style={styles.orderButton} onPress={handleOrderMovies}>
+        <Icon name={icon} size={22} color="#E74C3C" />
       </TouchableOpacity>
     </View>
   );

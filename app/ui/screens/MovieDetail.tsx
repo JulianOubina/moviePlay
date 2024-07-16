@@ -123,7 +123,7 @@ const MovieDetailScreen = ({ route }: Props) => {
       }
   
       setIsFavorite(!isFavorite);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error toggling favorite:', error.message);
     }
   };
@@ -155,7 +155,7 @@ const MovieDetailScreen = ({ route }: Props) => {
         showToast(`You rated this movie ${selectedRating} stars!`);
         setRatingModalVisible(false);
         fetchMovieDetails();
-      } catch (error) {
+      } catch (error:any) {
         console.error('Error submitting rating:', error.message);
       }
     } else {
@@ -275,7 +275,9 @@ const MovieDetailScreen = ({ route }: Props) => {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
           {movie.images.map((image, index) => (
-            <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+            <TouchableOpacity key={index} onPress={() => openImageModal(image)}>
+             <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
