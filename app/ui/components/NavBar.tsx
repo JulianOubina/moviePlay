@@ -7,6 +7,7 @@ import { RootStackParamList } from '../../navigation/navigator';
 const NavBar = () => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSearchSubmit = () => {
@@ -36,6 +37,10 @@ const NavBar = () => {
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearchSubmit}
+            onFocus={() => console.log(true)}
+            onBlur={() => console.log(false)}
+            //onFocus={() => setIsFocused(true)}
+            //onBlur={() => setIsFocused(false)}
             placeholderTextColor="#95A5A6"
             editable={true}
           />

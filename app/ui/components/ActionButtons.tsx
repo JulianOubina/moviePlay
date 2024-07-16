@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -9,7 +10,7 @@ type ActionButtonsProps = {
 
 function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
   const [icon, setIcon] = React.useState<string>("filter");
-  
+  const navigation = useNavigation();
   const ORDER_BY_DATE = 1;
   const ORDER_BY_RATING = 2;
   const ORDER_BY_BOTH = 3;
@@ -33,6 +34,9 @@ function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-back" size={25} color="#E74C3C" />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.filterButton}>
         <Icon name="funnel-outline" size={22} color="#E74C3C" />
       </TouchableOpacity>
@@ -40,6 +44,7 @@ function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
         <Icon name={icon} size={22} color="#E74C3C" />
       </TouchableOpacity>
     </View>
+    
   );
 }
 
@@ -47,7 +52,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 2,
     backgroundColor: 'gray',
-    top: '100%'
+    top: '100%',
   },
   container: {
     height: 35, // Set the desired height
@@ -63,6 +68,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 50,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    top: 10,
+    left: 10,
   },
 });
 

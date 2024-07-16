@@ -144,7 +144,9 @@ function Home() {
         <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       ) : (
         <ScrollView>
+          
           <View style={styles.carouselContainer}>
+            <View style={styles.divider} />
             <FlatList
               data={carrouselPhotos}
               keyExtractor={(item) => item.idMovie}
@@ -160,7 +162,9 @@ function Home() {
                 </TouchableOpacity>
               )}
             />
+            <View style={styles.divider} />
           </View>
+          
           <GenreScroll genreTitle={sortedGenres[0]} handleMoviePress={handleMoviePress} />
           <GenreScroll genreTitle={sortedGenres[1]} handleMoviePress={handleMoviePress} />
           <GenreScroll genreTitle={sortedGenres[2]} handleMoviePress={handleMoviePress} />
@@ -217,6 +221,10 @@ const styles = StyleSheet.create({
     width: screenWidth,
     height: 250,
     resizeMode: 'cover',
+  },
+  divider: {
+    height: 2,
+    backgroundColor: 'gray',
   },
 });
 
