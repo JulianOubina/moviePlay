@@ -9,6 +9,7 @@ import { UserContext } from './Login';
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from '@react-native-firebase/auth';
 import Carousel from "react-native-snap-carousel";
+import GenreScroll from "../components/GenreScroll";
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 
@@ -331,6 +332,7 @@ function Home() {
               onEndReachedThreshold={0.5}
             />
           </View>
+          <GenreScroll genreTitle="History" handleMoviePress={handleMoviePress}></GenreScroll>
         </ScrollView>
       )}
     </View>
