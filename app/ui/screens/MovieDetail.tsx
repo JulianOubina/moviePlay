@@ -11,7 +11,6 @@ import { UserContext } from './Login';
 type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'> & {
   params: {
     movieId: string;
-    posterImage: string;
   };
 };
 
@@ -42,7 +41,7 @@ type Movie = {
 
 const MovieDetailScreen = ({ route }: Props) => {
   const user = useContext(UserContext);
-  const { movieId, posterImage } = route.params;
+  const { movieId } = route.params;
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -210,7 +209,7 @@ const MovieDetailScreen = ({ route }: Props) => {
         <View style={styles.movieContainer}>
           <View style={styles.imageContainer}>
             <Image
-              source={movie.poster ? { uri: movie.poster } : { uri: posterImage }}
+              source={{ uri: movie.poster }}
               style={styles.image}
             />
             <View style={styles.buttonContainer}>

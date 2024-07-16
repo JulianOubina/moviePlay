@@ -67,7 +67,7 @@ function Home() {
       fetchMoviesGenres2(1);
       fetchMoviesGenres3(1);
       setLoading(false);
-    }, 3000);
+    }, 4000);
   }, []);
 
   const fetchMoviesGenres1 = async (pageNumber: any) => {
@@ -241,8 +241,8 @@ function Home() {
     }
   };
 
-  const handleMoviePress = (movieId:string, posterImage:string) => {
-    navigation.navigate('MovieDetail', { movieId: movieId, posterImage: posterImage });
+  const handleMoviePress = (movieId:string) => {
+    navigation.navigate('MovieDetail', { movieId: movieId });
   };
 
   return (
@@ -261,7 +261,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.carrouselSection}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.image)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie)}>
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: item.image }} style={styles.image} />
                   </View>
@@ -277,7 +277,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie )}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
@@ -298,7 +298,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie)}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
@@ -319,7 +319,7 @@ function Home() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie, item.images)}>
+                <TouchableOpacity onPress={() => handleMoviePress(item.idMovie)}>
                   <View style={styles.movieContainer}>
                     <Image source={{ uri: item.images }} style={styles.movieImage} />
                   </View>
