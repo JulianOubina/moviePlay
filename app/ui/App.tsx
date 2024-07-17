@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Modal, ActivityIndicator } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
-
 import Profile from '../ui/screens/Profile'; 
 import Home from './screens/Home';
 import EditProfile from './screens/EditProfile';
@@ -17,6 +16,19 @@ import { RootStackParamList } from '../navigation/navigator';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+const LockScreenModal = ({ visible }: { visible: boolean }) => (
+  <Modal
+    animationType="fade"
+    transparent={true}
+    visible={visible}
+  >
+    <View style={styles.lockScreen}>
+      <Text style={styles.lockScreenText}>No hay conexión a Internet</Text>
+      <ActivityIndicator size="large" color="#ffffff" />
+    </View>
+  </Modal>
+);
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(null);
@@ -43,14 +55,6 @@ const App = () => {
       unsubscribe();
     }    
   }, []);
-
-  if (!isConnected) {
-    return (
-      <View style={styles.lockScreen}>
-        <Text style={styles.lockScreenText}>No hay conexión a Internet</Text>
-      </View>
-    );
-  }
 
   return (
     <UserContext.Provider value={currentUser}>
@@ -99,11 +103,10 @@ const App = () => {
             component={Trailer}
             options={{ headerShown: false }} 
           />
-
         </Stack.Navigator>
       </NavigationContainer>
+      <LockScreenModal visible={!isConnected} />
     </UserContext.Provider>
-    
   );
 };
 
@@ -117,11 +120,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'red', // Color de fondo para la pantalla de bloqueo
+    backgroundColor: 'rgba(0,0,0,0.8)', 
   },
   lockScreenText: {
-    color: 'white', // Color del texto para la pantalla de bloqueo
-    fontSize: 20, // Tamaño del texto para la pantalla de bloqueo
+    color: 'white', 
+    fontSize: 20, 
+    marginBottom: 20,
   },
 });
 

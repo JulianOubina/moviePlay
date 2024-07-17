@@ -4,11 +4,16 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 
-const NavBar = () => {
+interface NavBarProps {
+  searchQueryInput: string;
+}
+
+const NavBar: React.FC<NavBarProps> = ({ searchQueryInput }) => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
+  
   const handleSearchSubmit = () => {
     navigation.navigate('Search', { searchQuery: searchText});
   };
@@ -32,10 +37,14 @@ const NavBar = () => {
           <Icon name="search" size={24} color="#E74C3C" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search..."
+            placeholder={searchQueryInput === '' ? "Search..." : searchQueryInput}
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearchSubmit}
+            onFocus={() => console.log(true)}
+            onBlur={() => console.log(false)}
+            //onFocus={() => setIsFocused(true)}
+            //onBlur={() => setIsFocused(false)}
             placeholderTextColor="#95A5A6"
             editable={true}
           />

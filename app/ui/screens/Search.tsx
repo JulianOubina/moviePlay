@@ -35,7 +35,11 @@ const SearchScreen = ({ route }: Props) => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
-  const [isOrdered, setIsOrdered] = useState(false);
+  const [isOrdered, setIsOrdered] = useState(0);
+
+  const ORDER_BY_DATE:number = 1;
+  const ORDER_BY_RATING:number = 2;
+  const ORDER_BY_BOTH:number = 3;
 
   const generateRandomKey = () => {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -51,7 +55,7 @@ const SearchScreen = ({ route }: Props) => {
     setMovies([]);
     setPage(1);
     setLoading(true);
-    setIsOrdered(false);
+    setIsOrdered(0);
     fetchMovies(1);
   }, [searchQuery]);
 
@@ -152,11 +156,34 @@ const SearchScreen = ({ route }: Props) => {
     return movies.slice().sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
   };
 
-  const handleOrderMovies = () =>{  {/* Hay que ponerlo como onclick en algun lado */}
-    const sortedMovies = sortMoviesByReleaseDate(movies);
-    setMovies([]); 
-    setMovies(sortedMovies); 
-    setIsOrdered(true);
+  const sortMoviesByRating = (movies: Movie[]): Movie[] => {
+    return movies.slice().sort((a, b) => b.rating - a.rating);
+  };
+
+  const sortMoviesByBoth = (movies: Movie[]): Movie[] => {
+    return movies.slice().sort((a, b) => {
+      if (new Date(a.releaseDate).getFullYear() === new Date(b.releaseDate).getFullYear()) {
+        return b.rating - a.rating;
+      }
+      return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+    });
+  };
+
+  const handleOrderMovies = () => {
+    const status = isOrdered === ORDER_BY_BOTH ? ORDER_BY_DATE : isOrdered + 1;
+    setIsOrdered(status);
+    let movieList: Movie[];
+    if(status === ORDER_BY_DATE){
+      movieList = sortMoviesByReleaseDate(movies);
+    }else if(status === ORDER_BY_RATING){
+      movieList = sortMoviesByRating(movies);
+    }else if(status === ORDER_BY_BOTH){
+      movieList = sortMoviesByBoth(movies);
+    }else{
+      movieList = movies;
+      console.error("Error en el ordenamiento");
+    }
+    setMovies(movieList);
   }
 
   if (loading) {
@@ -177,8 +204,8 @@ const SearchScreen = ({ route }: Props) => {
 
   return (
     <View style={styles.container}>
-      <NavBar />
-      <ActionButtons setIsOrdered={handleOrderMovies} />
+      <NavBar searchQueryInput={searchQuery} />
+      <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}
@@ -192,7 +219,6 @@ const SearchScreen = ({ route }: Props) => {
                 style={styles.resultItem}
                 onPress={() => navigation.navigate('MovieDetail', {
                   movieId: item.idMovie,
-                  posterImage: item.images
                 })}
               >
                 <Image

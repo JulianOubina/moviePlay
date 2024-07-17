@@ -11,7 +11,6 @@ import { UserContext } from './Login';
 type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'> & {
   params: {
     movieId: string;
-    posterImage: string;
   };
 };
 
@@ -26,6 +25,7 @@ type Movie = {
   genres: string[];
   releaseDate: string;
   rating: number;
+  poster: string;
   images: string[];
   cast: string[];
   sinopsis: string;
@@ -41,7 +41,7 @@ type Movie = {
 
 const MovieDetailScreen = ({ route }: Props) => {
   const user = useContext(UserContext);
-  const { movieId, posterImage } = route.params;
+  const { movieId } = route.params;
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -122,7 +122,7 @@ const MovieDetailScreen = ({ route }: Props) => {
       }
   
       setIsFavorite(!isFavorite);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error toggling favorite:', error.message);
     }
   };
@@ -154,7 +154,7 @@ const MovieDetailScreen = ({ route }: Props) => {
         showToast(`You rated this movie ${selectedRating} stars!`);
         setRatingModalVisible(false);
         fetchMovieDetails();
-      } catch (error) {
+      } catch (error:any) {
         console.error('Error submitting rating:', error.message);
       }
     } else {
@@ -179,11 +179,6 @@ const MovieDetailScreen = ({ route }: Props) => {
     setImageModalVisible(true);
   };
 
-  const closeImageModal = () => {
-    setSelectedImage(null);
-    setImageModalVisible(false);
-  };
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -196,6 +191,9 @@ const MovieDetailScreen = ({ route }: Props) => {
     return (
       <View style={styles.container}>
         <Text style={styles.text}>No se encontraron detalles para esta película.</Text>
+        <TouchableOpacity style={styles.backButton2} onPress={() => navigation.goBack()}>
+          <Icon name="close" size={25} color="#E74C3C" />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -209,7 +207,7 @@ const MovieDetailScreen = ({ route }: Props) => {
         <View style={styles.movieContainer}>
           <View style={styles.imageContainer}>
             <Image
-              source={{ uri: posterImage }}
+              source={{ uri: movie.poster }}
               style={styles.image}
             />
             <View style={styles.buttonContainer}>
@@ -274,7 +272,9 @@ const MovieDetailScreen = ({ route }: Props) => {
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imagesScroll}>
           {movie.images.map((image, index) => (
-            <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+            <TouchableOpacity key={index} onPress={() => openImageModal(image)}>
+             <Image key={index} source={{ uri: image }} style={styles.additionalImage} />
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
@@ -283,15 +283,15 @@ const MovieDetailScreen = ({ route }: Props) => {
           visible={imageModalVisible}
           transparent={true}
           animationType="slide"
-          onRequestClose={closeImageModal}
+          onRequestClose={() => setImageModalVisible(false)}
         >
           <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.closeModalButton} onPress={closeImageModal}>
-              <Icon name="close" size={30} color="#FFFFFF" />
-            </TouchableOpacity>
             {selectedImage && (
               <Image source={{ uri: selectedImage }} style={styles.fullscreenImage} />
             )}
+            <TouchableOpacity style={styles.closeModalButton} onPress={() => setImageModalVisible(false)}>
+              <Icon name="close" size={25} color="#E74C3C" />
+            </TouchableOpacity>
           </View>
       </Modal>
       
@@ -547,6 +547,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+  },
+  text: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 20,
+    marginVertical: 300,
+  },
+  backButton2: {
+    alignSelf: 'flex-end',
+    bottom: 350,
   },
 });
 
