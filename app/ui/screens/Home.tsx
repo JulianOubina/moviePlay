@@ -139,7 +139,7 @@ function Home() {
   
   return (
     <View style={styles.container}>
-      <NavBar />
+      <NavBar searchQueryInput={''} />
       {loading ? (
         <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       ) : (

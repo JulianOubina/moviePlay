@@ -179,11 +179,6 @@ const MovieDetailScreen = ({ route }: Props) => {
     setImageModalVisible(true);
   };
 
-  const closeImageModal = () => {
-    setSelectedImage(null);
-    setImageModalVisible(false);
-  };
-
   if (loading) {
     return (
       <View style={styles.container}>
@@ -288,15 +283,15 @@ const MovieDetailScreen = ({ route }: Props) => {
           visible={imageModalVisible}
           transparent={true}
           animationType="slide"
-          onRequestClose={closeImageModal}
+          onRequestClose={() => setImageModalVisible(false)}
         >
           <View style={styles.modalContainer}>
-            <TouchableOpacity style={styles.closeModalButton} onPress={closeImageModal}>
-              <Icon name="close" size={30} color="#FFFFFF" />
-            </TouchableOpacity>
             {selectedImage && (
               <Image source={{ uri: selectedImage }} style={styles.fullscreenImage} />
             )}
+            <TouchableOpacity style={styles.closeModalButton} onPress={() => setImageModalVisible(false)}>
+              <Icon name="close" size={25} color="#E74C3C" />
+            </TouchableOpacity>
           </View>
       </Modal>
       

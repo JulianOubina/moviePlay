@@ -10,7 +10,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import ActionButtons from '../components/ActionButtons';
-import { stat } from 'react-native-fs';
 
 type SearchRouteProp = RouteProp<RootStackParamList, 'Search'>;
 
@@ -205,7 +204,7 @@ const SearchScreen = ({ route }: Props) => {
 
   return (
     <View style={styles.container}>
-      <NavBar />
+      <NavBar searchQueryInput={searchQuery} />
       <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
@@ -220,7 +219,6 @@ const SearchScreen = ({ route }: Props) => {
                 style={styles.resultItem}
                 onPress={() => navigation.navigate('MovieDetail', {
                   movieId: item.idMovie,
-                  posterImage: item.images
                 })}
               >
                 <Image

@@ -120,12 +120,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)', // Color de fondo con opacidad para modal
+    backgroundColor: 'rgba(0,0,0,0.8)', 
   },
   lockScreenText: {
-    color: 'white', // Color del texto para la pantalla de bloqueo
-    fontSize: 20, // Tamaño del texto para la pantalla de bloqueo
-    marginBottom: 20, // Margen inferior para separar el texto del ActivityIndicator
+    color: 'white', 
+    fontSize: 20, 
+    marginBottom: 20,
   },
 });
 
