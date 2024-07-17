@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     zIndex: 1, // Asegura que el botón esté por encima del reproductor de video
   },
   videoPlayer: {
-    width: 300,
+    width: '100%',
     height: 300,
     justifyContent: 'center',
     alignItems: 'center',

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Modal, ActivityIndicator, Image } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,8 +24,12 @@ const LockScreenModal = ({ visible }: { visible: boolean }) => (
     visible={visible}
   >
     <View style={styles.lockScreen}>
-      <Text style={styles.lockScreenText}>No hay conexión a Internet</Text>
+      <Text style={styles.lockScreenText}>No internet connection</Text>
       <ActivityIndicator size="large" color="#ffffff" />
+        <Image
+          source={require('../assets/images/noConnectionRobot.png')}
+          style={styles.noConnectionImage}
+          />
     </View>
   </Modal>
 );
@@ -126,6 +130,13 @@ const styles = StyleSheet.create({
     color: 'white', 
     fontSize: 20, 
     marginBottom: 20,
+  },
+  noConnectionImage: {
+    width: 75,
+    height: 75,
+    marginTop: 20,
+    marginBottom: 20,
+    objectFit: 'contain',
   },
 });
 

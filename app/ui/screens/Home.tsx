@@ -139,18 +139,6 @@ function Home() {
   const handleFocus = (isFocusedParam:boolean) => {
     setIsFocused(isFocusedParam);
   }
-  
-  const handleMoreGenres = () => {
-    const init = genresIndex;
-    const end = genresIndex + 3;
-    
-    console.log("INIT: " + init + " END: " + end);
-    
-    setGenresIndex(end);
-
-    setDisplayGenres(prevGenres => [...prevGenres, ...sortedGenres.slice(init, end)]) ;
-  }
-
 
   return (
     <View style={styles.container}>

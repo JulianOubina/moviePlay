@@ -152,7 +152,7 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.text}>Cargando...</Text>
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       </View>
     );
   }
@@ -160,7 +160,11 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
   if (!movies.length) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.text}>No hay películas favoritas</Text>
+      <Text style={styles.text}>You don't have any movies added to favorites yet</Text>
+      <Image
+          source={require('../../assets/images/NoFavorites.png')}
+          style={styles.favsImage}
+          />
       </View>
     );
   }
@@ -179,8 +183,7 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
               <TouchableOpacity
                 style={styles.resultItem}
                 onPress={() => navigation.navigate('MovieDetail', {
-                  movieId: item.idMovie,
-                  posterImage: item.images
+                  movieId: item.idMovie
                 })}
               >
                 <Image
@@ -216,6 +219,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#332222',
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
   },
   searchResultsContainer: {
     flex: 1,
@@ -266,6 +273,12 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  favsImage: {
+    width: 100,
+    height: 100,
+    marginTop: 20,
+    objectFit: 'contain',
   },
 });
 

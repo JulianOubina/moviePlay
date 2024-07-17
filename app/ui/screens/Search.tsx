@@ -191,18 +191,25 @@ const SearchScreen = ({ route }: Props) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.text}>Cargando...</Text>
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       </View>
     );
   }
 
-  if (!movies.length && !loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.text}>No hay películas para la búsqueda</Text>
-      </View>
-    );
-  }
+  // if (!movies.length && !loading) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //     <TouchableOpacity style={styles.backButton2} onPress={() => navigation.goBack()}>
+  //       <Icon name="close" size={25} color="#E74C3C" />
+  //     </TouchableOpacity>
+  //     <Text style={styles.text}>No movies found for the search</Text>
+  //     <Image
+  //       source={require('../../assets/images/searchNotFoundMarron.png')}
+  //       style={styles.notFoundImage}
+  //       />
+  //     </View>
+  //   );
+  // }
 
   const handleFocus = (state:boolean) => {
     setIsFocused(state);
@@ -211,6 +218,19 @@ const SearchScreen = ({ route }: Props) => {
   return (
     <View style={styles.container}>
       <NavBar searchQueryInput={searchQuery} isFocused={isFocused} setIsFocused={handleFocus}/>
+      {!movies.length && !loading ? 
+      (<View style={styles.loadingContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={25} color="#E74C3C" />
+        </TouchableOpacity>
+        <Text style={styles.text}>No movies found for the search</Text>
+        <Image
+          source={require('../../assets/images/searchNotFoundMarron.png')}
+          style={styles.notFoundImage}
+          />
+        </View>
+      ):(
+        <>
       <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
@@ -248,7 +268,7 @@ const SearchScreen = ({ route }: Props) => {
           contentContainerStyle={styles.listContentContainer}
         />
         
-      </View>
+      </View></>)}
     </View>
   );
 };
@@ -283,6 +303,10 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: -80,
     borderBottomLeftRadius: -80,
   },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   image: {
     width: 100,
     height: 150,
@@ -313,6 +337,17 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  notFoundImage: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
+    objectFit: 'contain',
+  },
+  backButton: {
+    position:'absolute',
+    top: 10,
+    left: 10,
   },
 });
 

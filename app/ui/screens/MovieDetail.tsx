@@ -189,11 +189,15 @@ const MovieDetailScreen = ({ route }: Props) => {
 
   if (!movie) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>No se encontraron detalles para esta película.</Text>
-        <TouchableOpacity style={styles.backButton2} onPress={() => navigation.goBack()}>
-          <Icon name="close" size={25} color="#E74C3C" />
-        </TouchableOpacity>
+      <View style={styles.containerNotFound}>
+      <Text style={styles.text}>No details found for this movie.</Text>
+      <TouchableOpacity style={styles.backButton2} onPress={() => navigation.goBack()}>
+        <Icon name="close" size={25} color="#E74C3C" />
+      </TouchableOpacity>
+      <Image
+          source={require('../../assets/images/noDetailsFound.png')}
+          style={styles.notFoundImage}
+          />
       </View>
     );
   }
@@ -552,11 +556,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     marginBottom: 20,
-    marginVertical: 300,
+    //marginVertical: 300,
   },
   backButton2: {
     alignSelf: 'flex-end',
     bottom: 350,
+  },
+  notFoundImage: {
+    width: 100,
+    height: 100,
+    marginTop: 20,
+    objectFit: 'contain',
+  },
+  containerNotFound: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#332222',
   },
 });
 
