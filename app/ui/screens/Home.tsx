@@ -8,7 +8,6 @@ import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from '@react-native-firebase/auth';
-import Carousel from "react-native-snap-carousel";
 import GenreScroll from "../components/GenreScroll";
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
@@ -48,6 +47,7 @@ function Home() {
   const user = React.useContext(UserContext);
   const [carrouselPhotos, setCarrouselPhotos] = React.useState<Carrousel[]>([]);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isFocused, setIsFocused] = React.useState(false);
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -136,15 +136,34 @@ function Home() {
     navigation.navigate('MovieDetail', { movieId: movieId });
   };
 
+  const handleFocus = (isFocusedParam:boolean) => {
+    setIsFocused(isFocusedParam);
+  }
   
+  const handleMoreGenres = () => {
+    const init = genresIndex;
+    const end = genresIndex + 3;
+    
+    console.log("INIT: " + init + " END: " + end);
+    
+    setGenresIndex(end);
+
+    setDisplayGenres(prevGenres => [...prevGenres, ...sortedGenres.slice(init, end)]) ;
+  }
+
+
   return (
     <View style={styles.container}>
-      <NavBar searchQueryInput={''} />
+      <NavBar searchQueryInput={''} isFocused={isFocused} setIsFocused={handleFocus} />
+      {isFocused && 
+        <View style={styles.overlay}>
+          <Text>HOLA</Text>
+        </View>
+      }
       {loading ? (
         <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       ) : (
         <ScrollView>
-          
           <View style={styles.carouselContainer}>
             <View style={styles.divider} />
             <FlatList
@@ -226,6 +245,14 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'gray',
   },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    opacity: 0.3
+  }
 });
 
 export default Home;

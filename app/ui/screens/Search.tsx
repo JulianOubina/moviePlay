@@ -36,6 +36,8 @@ const SearchScreen = ({ route }: Props) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
   const [isOrdered, setIsOrdered] = useState(0);
+  const [isFocused, setIsFocused] = React.useState(false);
+
 
   const ORDER_BY_DATE:number = 1;
   const ORDER_BY_RATING:number = 2;
@@ -202,9 +204,13 @@ const SearchScreen = ({ route }: Props) => {
     );
   }
 
+  const handleFocus = (state:boolean) => {
+    setIsFocused(state);
+  }
+
   return (
     <View style={styles.container}>
-      <NavBar searchQueryInput={searchQuery} />
+      <NavBar searchQueryInput={searchQuery} isFocused={isFocused} setIsFocused={handleFocus}/>
       <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList

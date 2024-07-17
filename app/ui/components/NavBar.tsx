@@ -6,12 +6,15 @@ import { RootStackParamList } from '../../navigation/navigator';
 
 interface NavBarProps {
   searchQueryInput: string;
+  isFocused: boolean;
+  setIsFocused: (isFocused: boolean) => void;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ searchQueryInput }) => {
+
+const NavBar: React.FC<NavBarProps> = ({ searchQueryInput, isFocused, setIsFocused }) => {
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  //const [isFocused, setIsFocused] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   
   const handleSearchSubmit = () => {
@@ -41,50 +44,14 @@ const NavBar: React.FC<NavBarProps> = ({ searchQueryInput }) => {
             value={searchText}
             onChangeText={setSearchText}
             onSubmitEditing={handleSearchSubmit}
-            onFocus={() => console.log(true)}
-            onBlur={() => console.log(false)}
-            //onFocus={() => setIsFocused(true)}
-            //onBlur={() => setIsFocused(false)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholderTextColor="#95A5A6"
             editable={true}
           />
         </View>
       </View>
       <View style={styles.divider} />
-      {/* Modal para filtros */}
-      {/* <Modal
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={closeModal}
-        animationType="slide"
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Select Filters</Text>
-            {/* Aquí van las opciones de filtro 
-            <View style={styles.filterOptions}>
-              <TouchableOpacity style={styles.filterButtonOption}>
-                <Text style={styles.filterText}>Filter 1</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.filterButtonOption}>
-                <Text style={styles.filterText}>Filter 2</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.filterButtonOption}>
-                <Text style={styles.filterText}>Filter 3</Text>
-              </TouchableOpacity>
-            </View>
-            {/* Botones de modal 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={handleFilterApply}>
-                <Text style={styles.modalButtonText}>Apply Filters</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal> */}
     </View>
   );
 };
@@ -182,6 +149,20 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  overlay:{
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+  },
+  overlayText:{
+    color: '#fff',
+    fontSize: 20,
+  }
 });
 
 export default NavBar;
