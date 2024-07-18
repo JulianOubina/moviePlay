@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from './Login';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Modal} from 'react-native';
 import axios from 'axios';
 import { RouteProp, useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import ActionButtons from '../components/ActionButtons';
+
 
 type SearchRouteProp = RouteProp<RootStackParamList, 'Search'>;
 
@@ -28,6 +29,13 @@ type Movie = {
   images: string;
 };
 
+const genres = [
+  "Action", "Adventure", "Animation", "Comedy", "Crime",
+  "Documentary", "Drama", "Family", "Fantasy", "History",
+  "Horror", "Music", "Mystery", "Romance", "Science Fiction",
+  "TV Movie", "Thriller", "War", "Western"
+];
+
 const SearchScreen = ({ route }: Props) => {
   const { searchQuery } = route.params;
   const user = useContext(UserContext);
@@ -36,8 +44,9 @@ const SearchScreen = ({ route }: Props) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
   const [isOrdered, setIsOrdered] = useState(0);
-  const [isFocused, setIsFocused] = React.useState(false);
-
+  const [isFocused, setIsFocused] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
   const ORDER_BY_DATE:number = 1;
   const ORDER_BY_RATING:number = 2;
@@ -188,6 +197,29 @@ const SearchScreen = ({ route }: Props) => {
     setMovies(movieList);
   }
 
+  const handleFilterMovies = () => {
+    setIsModalVisible(true);
+  }
+
+  const handleGenreSelect = (genre: string) => {
+    setSelectedGenres((prevSelectedGenres) => {
+      if (prevSelectedGenres.includes(genre)) {
+        return prevSelectedGenres.filter((g) => g !== genre);
+      } else {
+        return [...prevSelectedGenres, genre];
+      }
+    });
+  };
+
+  const applyFilters = () => {
+    setIsModalVisible(false);
+    // Agrega tu lógica para filtrar las películas según los géneros seleccionados aquí
+  };
+
+  const handleFocus = (state:boolean) => {
+    setIsFocused(state);
+  }
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -196,24 +228,21 @@ const SearchScreen = ({ route }: Props) => {
     );
   }
 
-  // if (!movies.length && !loading) {
-  //   return (
-  //     <View style={styles.loadingContainer}>
-  //     <TouchableOpacity style={styles.backButton2} onPress={() => navigation.goBack()}>
-  //       <Icon name="close" size={25} color="#E74C3C" />
-  //     </TouchableOpacity>
-  //     <Text style={styles.text}>No movies found for the search</Text>
-  //     <Image
-  //       source={require('../../assets/images/searchNotFoundMarron.png')}
-  //       style={styles.notFoundImage}
-  //       />
-  //     </View>
-  //   );
-  // }
-
-  const handleFocus = (state:boolean) => {
-    setIsFocused(state);
-  }
+  const renderGenreButtons = () => {
+    const rows = [];
+    for (let i = 0; i < genres.length; i += 3) {
+      rows.push(
+        <View key={i} style={styles.genreRow}>
+          {genres.slice(i, i + 3).map((genre, index) => (
+            <TouchableOpacity key={index} style={styles.genreButton}>
+              <Text style={styles.genreButtonText}>{genre}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      );
+    }
+    return rows;
+  };
 
   return (
     <View style={styles.container}>
@@ -231,7 +260,7 @@ const SearchScreen = ({ route }: Props) => {
         </View>
       ):(
         <>
-      <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} />
+      <ActionButtons isOrdered={isOrdered} handleOrderMovies={handleOrderMovies} handleFilterMovies={handleFilterMovies} />
       <View style={styles.searchResultsContainer}>
         <FlatList
           data={movies}
@@ -269,6 +298,30 @@ const SearchScreen = ({ route }: Props) => {
         />
         
       </View></>)}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Genre</Text>
+            <View style={styles.genreContainer}>
+              {renderGenreButtons()}
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setIsModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.submitButton}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -278,11 +331,54 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#332222',
   },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  genreContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  submitButton: {
+    backgroundColor: '#0096E3',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  genreRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#FF4B3A',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#332222',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
   },
   searchResultsContainer: {
     flex: 1,
@@ -348,6 +444,44 @@ const styles = StyleSheet.create({
     position:'absolute',
     top: 10,
     left: 10,
+  },
+  modalContainer: {
+    marginVertical: 300,
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignSelf: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  genreButton: {
+    paddingVertical: 8, // Ajusta el padding vertical para hacer los botones más pequeños
+    paddingHorizontal: 12, // Ajusta el padding horizontal para hacer los botones más pequeños
+    backgroundColor: '#ddd',
+    margin: 4, // Ajusta el margen entre botones
+    borderRadius: 5,
+    minWidth: 80, // Ajusta el ancho mínimo para asegurar que los botones sean consistentes
+    alignItems: 'center',
+  },
+  genreButtonText: {
+    fontSize: 14, // Ajusta el tamaño del texto para hacerlo más pequeño
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    padding: 10,
+    backgroundColor: '#E74C3C',
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

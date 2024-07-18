@@ -5,10 +5,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 type ActionButtonsProps = {
   handleOrderMovies: () => void;
+  handleFilterMovies: () => void;
   isOrdered: number;
 };
 
-function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
+function ActionButtons({ isOrdered, handleOrderMovies, handleFilterMovies }: ActionButtonsProps) {
   const [icon, setIcon] = React.useState<string>("filter");
   const navigation = useNavigation();
   const ORDER_BY_DATE = 1;
@@ -37,7 +38,7 @@ function ActionButtons({ isOrdered, handleOrderMovies }: ActionButtonsProps) {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Icon name="arrow-back" size={25} color="#E74C3C" />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.filterButton}>
+      <TouchableOpacity style={styles.filterButton} onPress={handleFilterMovies}>
         <Icon name="funnel-outline" size={22} color="#E74C3C" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.orderButton} onPress={handleOrderMovies}>
