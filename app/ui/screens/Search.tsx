@@ -30,16 +30,17 @@ type Movie = {
 };
 
 const genres = [
-  "Action", "Adventure", "Animation", "Comedy", "Crime",
+  "Action", "Adventure", "Animation", "Music", "Crime",
   "Documentary", "Drama", "Family", "Fantasy", "History",
-  "Horror", "Music", "Mystery", "Romance", "Science Fiction",
-  "TV Movie", "Thriller", "War", "Western"
+  "Horror", "Comedy", "Mystery", "Romance", "Western",
+  "TV Movie", "Thriller", "War", "Science Fiction"
 ];
 
 const SearchScreen = ({ route }: Props) => {
   const { searchQuery } = route.params;
   const user = useContext(UserContext);
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [moviesCopy, setMoviesCopy] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [page, setPage] = useState(1);
@@ -71,7 +72,7 @@ const SearchScreen = ({ route }: Props) => {
   }, [searchQuery]);
 
   const fetchMovies = async (pageNumber: any) => {
-    if (isOrdered){
+    if (isOrdered || moviesCopy.length){
       return;
     }
     try {
@@ -198,23 +199,34 @@ const SearchScreen = ({ route }: Props) => {
   }
 
   const handleFilterMovies = () => {
+    // hay que hacer una copia de la peliculas originales para no perderlas
+    if(moviesCopy.length === 0){
+      setMoviesCopy(movies);
+    }
     setIsModalVisible(true);
   }
 
   const handleGenreSelect = (genre: string) => {
-    setSelectedGenres((prevSelectedGenres) => {
-      if (prevSelectedGenres.includes(genre)) {
-        return prevSelectedGenres.filter((g) => g !== genre);
-      } else {
-        return [...prevSelectedGenres, genre];
-      }
-    });
+    if (selectedGenres.includes(genre)) {
+      setSelectedGenres([]);
+    } else {
+      setSelectedGenres([genre]);
+    }
   };
 
   const applyFilters = () => {
+    console.log(selectedGenres);
+    setMovies(moviesCopy.filter(movie => movie.genres.some(genre => selectedGenres.includes(genre))));
     setIsModalVisible(false);
-    // Agrega tu lógica para filtrar las películas según los géneros seleccionados aquí
   };
+
+  const clearFilters = () => {
+    console.log(moviesCopy.map(movie => movie.title));
+    
+    setMovies(moviesCopy);
+    setMoviesCopy([]);
+    setIsModalVisible(false);
+  }
 
   const handleFocus = (state:boolean) => {
     setIsFocused(state);
@@ -233,11 +245,18 @@ const SearchScreen = ({ route }: Props) => {
     for (let i = 0; i < genres.length; i += 3) {
       rows.push(
         <View key={i} style={styles.genreRow}>
-          {genres.slice(i, i + 3).map((genre, index) => (
-            <TouchableOpacity key={index} style={styles.genreButton}>
-              <Text style={styles.genreButtonText}>{genre}</Text>
-            </TouchableOpacity>
-          ))}
+          {genres.slice(i, i + 3).map((genre, index) => {
+            const isSelected = selectedGenres.includes(genre);
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.genreButton, isSelected && styles.genreButtonSelected]}
+                onPress={() => handleGenreSelect(genre)}
+              >
+                <Text style={[styles.genreButtonText, isSelected && styles.genreButtonTextSelected]}>{genre}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       );
     }
@@ -315,8 +334,13 @@ const SearchScreen = ({ route }: Props) => {
               <TouchableOpacity style={styles.cancelButton} onPress={() => setIsModalVisible(false)}>
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.submitButton}>
-                <Text style={styles.submitButtonText}>Submit</Text>
+              <TouchableOpacity style={styles.clearButton} onPress={() => clearFilters()}>
+                <Text style={styles.submitButtonText}>Clear Filters</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.submitButton} onPress={() => applyFilters()}>
+                  <Text style={styles.submitButtonText}>Filter</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -344,6 +368,12 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#0096E3',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+  },
+  clearButton: {
+    backgroundColor: 'green',
     padding: 10,
     borderRadius: 5,
     flex: 1,
@@ -446,10 +476,10 @@ const styles = StyleSheet.create({
     left: 10,
   },
   modalContainer: {
-    marginVertical: 300,
+    marginVertical: 100,
     padding: 20,
     borderRadius: 10,
-    width: '80%',
+    width: '90%',
     alignSelf: 'center',
   },
   modalTitle: {
@@ -459,16 +489,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   genreButton: {
-    paddingVertical: 8, // Ajusta el padding vertical para hacer los botones más pequeños
-    paddingHorizontal: 12, // Ajusta el padding horizontal para hacer los botones más pequeños
+    paddingVertical: 8, 
+    paddingHorizontal: 12, 
     backgroundColor: '#ddd',
-    margin: 4, // Ajusta el margen entre botones
+    margin: 4, 
     borderRadius: 5,
-    minWidth: 80, // Ajusta el ancho mínimo para asegurar que los botones sean consistentes
+    minWidth: 80, 
     alignItems: 'center',
   },
   genreButtonText: {
-    fontSize: 14, // Ajusta el tamaño del texto para hacerlo más pequeño
+    fontSize: 14, 
   },
   modalActions: {
     flexDirection: 'row',
@@ -482,6 +512,12 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  genreButtonSelected: {
+    backgroundColor: '#0096E3',
+  },
+  genreButtonTextSelected: {
+    color: '#fff',
   },
 });
 

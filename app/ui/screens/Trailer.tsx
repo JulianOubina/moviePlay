@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
+const { width: screenWidth } = Dimensions.get('window');
+
 const Trailer = ({ route }) => {
   const { trailer } = route.params;
   const navigation = useNavigation();
@@ -18,7 +20,7 @@ const Trailer = ({ route }) => {
       <View style={styles.videoPlayer}>
         <YoutubePlayer
           height={300}
-          width={300}
+          width={screenWidth}
           play={true}
           videoId={trailer}
         />

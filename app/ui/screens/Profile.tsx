@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
@@ -18,6 +18,7 @@ const Profile: React.FC = () => {
   const [lastName, setLastName] = useState();
   const [nick, setNick] = useState();
   const [profileImage, setProfileImage] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getData();
@@ -49,7 +50,7 @@ const Profile: React.FC = () => {
       setLastName(lastNameParts.join(' '));
       setNick(response.data.nick);
       setProfileImage(response.data.image);
-
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }    
@@ -155,9 +156,13 @@ const Profile: React.FC = () => {
     });
   };
 
-  //const displayName = user?.displayName || '';
-  //const [firstName, ...lastNameParts] = displayName.split(' ');
-  //const lastName = lastNameParts.join(' ');
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -219,6 +224,16 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     width: '100%', 
     alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#332222',
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
   },
   name: {
     fontSize: 20,
