@@ -7,21 +7,27 @@ import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getNewTokens } from '../../navigation/RefreshToken';
+
 
 const Profile: React.FC = () => {
   const user = useContext(UserContext);
   console.log(user)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [nick, setNick] = useState();
-  const [profileImage, setProfileImage] = useState();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [nick, setNick] = useState('');
+  const [profileImage, setProfileImage] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getData();
-  }, []);
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      getData();
+    });
+  
+    return unsubscribeFocus;
+  }, [navigation]);
 
   const getData = async () => {
     try {
@@ -50,9 +56,15 @@ const Profile: React.FC = () => {
       setNick(response.data.nick);
       setProfileImage(response.data.image);
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }    
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        await getNewTokens();
+        getData();
+      } else {
+        console.error(error);
+        setLoading(false);
+      }
+    }
   };
 
   const handleSignOut = async () => {
@@ -77,9 +89,14 @@ const Profile: React.FC = () => {
 
       Alert.alert('Signed out', 'You have been signed out successfully.');
       navigation.navigate('Login'); 
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        await getNewTokens();
+        handleSignOut();
+      } else {
+        console.error(error);
+        setLoading(false);
+      }
     }
   };
 
@@ -121,44 +138,23 @@ const Profile: React.FC = () => {
     
   };
   
-  const getNewTokens = async () => {
-    const refresh = await AsyncStorage.getItem('refreshToken');
-    const session = await AsyncStorage.getItem('sessionToken');
-    console.log(refresh, session)
-    try {
-        const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-            headers: {
-                'sessionToken': session,
-                'refreshToken': refresh
-            },
-        });
-
-        console.log(response.data);
-
-        await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-        return;
-    } catch (err:any) {
-        console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-        handleSignOut()
-        return;
-    }
-}
 
 
   const handleEditProfile = () => {
+    console.log(firstName, lastName, nick);
+    
     navigation.navigate('EditProfile', {
       userFirstName:firstName?firstName:"",
       userLastName:lastName?lastName:"",
       userNick:nick?nick:"",
-      userImage:profileImage?profileImage:""
+      userImage:profileImage?profileImage:"",
     });
   };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#E74C3C" />
       </View>
     );
   }

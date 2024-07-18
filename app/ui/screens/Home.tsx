@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, ActivityIndicator, Alert, Image, FlatList, Text, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Alert, Image, FlatList, Dimensions, ScrollView, TouchableOpacity, Keyboard } from 'react-native';
 import NavBar from "../components/NavBar";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -9,6 +9,9 @@ import { UserContext } from './Login';
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from '@react-native-firebase/auth';
 import GenreScroll from "../components/GenreScroll";
+import Recents from "../components/Recents";
+import { getNewTokens } from '../../navigation/RefreshToken';
+
 
 type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 
@@ -54,7 +57,7 @@ function Home() {
     setTimeout(() => {
       fetchCarrousel();
       setLoading(false);
-    }, 4000);
+    }, 5000);
   }, []);
 
   React.useEffect(() => {
@@ -87,62 +90,15 @@ function Home() {
     }
   }
 
-  const getNewTokens = async () => {
-    const refresh = await AsyncStorage.getItem('refreshToken');
-    const session = await AsyncStorage.getItem('sessionToken');
-
-    try {
-      const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-        headers: {
-          'sessionToken': session,
-          'refreshToken': refresh,
-        },
-      });
-
-      await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-      return;
-    } catch (err: any) {
-      console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-      handleSignOut();
-      return;
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const token = await AsyncStorage.getItem('sessionToken');
-
-      if (token && user?.uid) {
-        await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'googleId': user.uid,
-          },
-        });
-      }
-
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      await auth().signOut();
-
-      await AsyncStorage.removeItem('sessionToken');
-      await AsyncStorage.removeItem('refreshToken');
-
-      Alert.alert('Signed out', 'You have been signed out successfully.');
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-    }
-  };
-
   const handleMoviePress = (movieId:string) => {
     navigation.navigate('MovieDetail', { movieId: movieId });
   };
 
   const handleFocus = (isFocusedParam:boolean) => {
     setIsFocused(isFocusedParam);
+    if (!isFocusedParam) {
+      Keyboard.dismiss(); 
+    }
   }
 
   const handleScrollEnd = (event: { nativeEvent: { contentOffset: { y: number }, layoutMeasurement: { height: number }, contentSize: { height: number } } }) => {
@@ -156,17 +112,11 @@ function Home() {
   return (
     <View style={styles.container}>
       <NavBar searchQueryInput={''} isFocused={isFocused} setIsFocused={handleFocus} />
-      {isFocused && 
-        <View style={styles.overlay}>
-          <Text>HOLA</Text>
-        </View>
-      }
       {loading ? (
-        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#E74C3C" />
       ) : (
         <ScrollView onScrollEndDrag={handleScrollEnd}>
           <View style={styles.carouselContainer}>
-            <View style={styles.divider} />
             <FlatList
               data={carrouselPhotos}
               keyExtractor={(item) => item.idMovie}
@@ -182,13 +132,15 @@ function Home() {
                 </TouchableOpacity>
               )}
             />
-            <View style={styles.divider} />
-          </View>
+          </View>            
           {sortedGenres.slice(0, numberRows).map((genre, index) => (
             <GenreScroll key={index} genreTitle={genre} handleMoviePress={handleMoviePress} />
           ))}
         </ScrollView>
       )}
+      {isFocused && 
+        <Recents handleFocus={handleFocus} />
+      }
     </View>
   );
 }
@@ -227,9 +179,13 @@ const styles = StyleSheet.create({
   carouselContainer: {
     height: 250,
     width: '100%',
+    borderStyle: 'solid',
+    borderColor: 'gray',
+    borderBottomWidth: 2,
   },
   carrouselSection: {
     marginHorizontal: 0,
+    
   },
   imageContainer: {
     flex: 1,
@@ -247,12 +203,14 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    top: 0,
+    top: 71,
     right: 0,
     bottom: 0,
     left: 0,
-    opacity: 0.3
-  }
+    backgroundColor: '#332222', 
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default Home;

@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from './Login';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import { getNewTokens } from '../../navigation/RefreshToken';
+
 
 
 type Movie = {
@@ -78,73 +78,27 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
     }
   };
 
-  const fetchMovieDetails = async (movieId: string, token: string) => {
-    try {
-      const response = await axios.get(`https://dai-movieapp-api.onrender.com/movies/${movieId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching details for movie ID ${movieId}:`, error);
-      throw error;
-    }
-  };
+  // const fetchMovieDetails = async (movieId: string, token: string) => {
+  //   try {
+  //     const response = await axios.get(`https://dai-movieapp-api.onrender.com/movies/${movieId}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error(`Error fetching details for movie ID ${movieId}:`, error);
+  //     throw error;
+  //   }
+  // };
 
-  const getNewTokens = async () => {
-    const refresh = await AsyncStorage.getItem('refreshToken');
-    const session = await AsyncStorage.getItem('sessionToken');
-
-    try {
-      const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-        headers: {
-          'sessionToken': session,
-          'refreshToken': refresh,
-        },
-      });
-
-      await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-    } catch (err: any) {
-      console.error("NO SE PUDO OBTENER EL NUEVO TOKEN", err);
-      handleSignOut();
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const token = await AsyncStorage.getItem('sessionToken');
-
-      if (token && user?.uid) {
-        await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'googleId': user.uid,
-          },
-        });
-      }
-
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      await auth().signOut();
-
-      await AsyncStorage.removeItem('sessionToken');
-      await AsyncStorage.removeItem('refreshToken');
-
-      Alert.alert('Signed out', 'You have been signed out successfully.');
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-    }
-  };
+  
 
   const renderFooter = () => {
     if (!loading) return null;
     return (
       <View>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#E74C3C" />
       </View>
     );
   };
@@ -152,7 +106,7 @@ const FavoritesScreen: React.FC<Props> = ({ route }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#E74C3C" />
       </View>
     );
   }

@@ -7,6 +7,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { RootStackParamList } from '../../navigation/navigator'; 
 import Share from 'react-native-share';
 import { UserContext } from './Login';
+import { getNewTokens } from '../../navigation/RefreshToken';
+
 
 type MovieDetailRouteProp = RouteProp<RootStackParamList, 'MovieDetail'> & {
   params: {
@@ -51,6 +53,7 @@ const MovieDetailScreen = ({ route }: Props) => {
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+
   const fetchMovieDetails = async () => {
     try {
       const token = await AsyncStorage.getItem('sessionToken');
@@ -64,9 +67,14 @@ const MovieDetailScreen = ({ route }: Props) => {
       setIsFavorite(response.data.userFavorite);
       setSelectedRating(response.data.userRating); 
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching movie details:', error);
-      setLoading(false);
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        await getNewTokens();
+        fetchMovieDetails();
+      } else {
+        console.error(error);
+        setLoading(false);
+      }
     }
   };
 
@@ -122,8 +130,14 @@ const MovieDetailScreen = ({ route }: Props) => {
       }
   
       setIsFavorite(!isFavorite);
-    } catch (error:any) {
-      console.error('Error toggling favorite:', error.message);
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        await getNewTokens();
+        handleToggleFavorite();
+      } else {
+        console.error(error);
+        setLoading(false);
+      }
     }
   };
 
@@ -154,8 +168,14 @@ const MovieDetailScreen = ({ route }: Props) => {
         showToast(`You rated this movie ${selectedRating} stars!`);
         setRatingModalVisible(false);
         fetchMovieDetails();
-      } catch (error:any) {
-        console.error('Error submitting rating:', error.message);
+      } catch (error: any) {
+        if (error.response?.status === 403) {
+          await getNewTokens();
+          handleSubmitRating();
+        } else {
+          console.error(error);
+          setLoading(false);
+        }
       }
     } else {
       showToast('Please select a rating before submitting.');
@@ -182,7 +202,7 @@ const MovieDetailScreen = ({ route }: Props) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#E74C3C" />
       </View>
     );
   }

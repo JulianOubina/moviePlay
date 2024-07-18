@@ -27,6 +27,8 @@ const EditProfile = ({ route }: Props) => {
   const [nick, setNick] = useState(userNick);
   const [selectImage, setSelectedImage] = useState(userImage);
 
+  console.log(firstName, lastName, nick);
+  
   const handleProfileImage = async () => {
     let options = {
       mediaType: 'photo',
@@ -81,6 +83,10 @@ const EditProfile = ({ route }: Props) => {
       });
 
       console.log('User Data:', response.data);
+      setFirstName('')
+      setLastName('')
+      setNick('')
+      setSelectedImage('')
       handleRollback();
     } catch (error: any) {
       switch (error.response.status) {
@@ -173,7 +179,7 @@ const EditProfile = ({ route }: Props) => {
           style={styles.input}
           onChangeText={setFirstName}
           value={firstName}
-          placeholder="Enter first name"
+          placeholder={userFirstName}
         />
         <View style={styles.underline} />
 
@@ -182,7 +188,7 @@ const EditProfile = ({ route }: Props) => {
           style={styles.input}
           onChangeText={setLastName}
           value={lastName}
-          placeholder="Enter last name"
+          placeholder={userLastName}
         />
         <View style={styles.underline} />
 
@@ -191,7 +197,7 @@ const EditProfile = ({ route }: Props) => {
           style={styles.input}
           onChangeText={setNick}
           value={nick}
-          placeholder="Enter a nickname"
+          placeholder={userNick}
         />
         <View style={styles.underline} />
       </View>
@@ -218,6 +224,9 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     marginTop: 40,
     marginBottom: 50,
+    borderRadius: 75,
+    borderWidth: 2,
+    borderColor: '#FF4B3A',
   },
   input: {
     height: 15,
@@ -231,8 +240,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    borderWidth: 2,
-    borderColor: '#FF4B3A',
   },
   textContainer: {
     backgroundColor: '#505050',

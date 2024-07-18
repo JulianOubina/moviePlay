@@ -7,9 +7,9 @@ import { RootStackParamList } from '../../navigation/navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavBar from '../components/NavBar';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
 import ActionButtons from '../components/ActionButtons';
+import { getNewTokens } from '../../navigation/RefreshToken';
+
 
 
 type SearchRouteProp = RouteProp<RootStackParamList, 'Search'>;
@@ -105,61 +105,12 @@ const SearchScreen = ({ route }: Props) => {
     }
   };
 
-  const getNewTokens = async () => {
-    const refresh = await AsyncStorage.getItem('refreshToken');
-    const session = await AsyncStorage.getItem('sessionToken');
-
-    try {
-      const response = await axios.put('https://dai-movieapp-api.onrender.com/auth', {}, {
-        headers: {
-          'sessionToken': session,
-          'refreshToken': refresh,
-        },
-      });
-
-      await AsyncStorage.setItem('sessionToken', response.data.sessionToken);
-      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
-      return;
-    } catch (err: any) {
-      console.log("NO SE PUDO OBTENER EL NUEVO TOKEN " + err);
-      handleSignOut();
-      return;
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const token = await AsyncStorage.getItem('sessionToken');
-
-      if (token && user?.uid) {
-        await axios.delete('https://dai-movieapp-api.onrender.com/auth', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'googleId': user.uid,
-          },
-        });
-      }
-
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      await auth().signOut();
-
-      await AsyncStorage.removeItem('sessionToken');
-      await AsyncStorage.removeItem('refreshToken');
-
-      Alert.alert('Signed out', 'You have been signed out successfully.');
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Sign out failed', 'Failed to sign out. Please try again.');
-    }
-  };
-
+  
   const renderFooter = () => {
     if (!loading) return null;
     return (
       <View>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={"#E74C3C"}/>
       </View>
     );
   };
@@ -231,7 +182,7 @@ const SearchScreen = ({ route }: Props) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
+        <ActivityIndicator style={styles.loadingIndicator} size="large" color="#E74C3C" />
       </View>
     );
   }
@@ -299,7 +250,7 @@ const SearchScreen = ({ route }: Props) => {
                   <Text style={styles.title}>{item.title} {item.subtitle} ({releaseYear})</Text>
                   <View style={styles.ratingContainer}>
                     <Icon name="star" size={15} color="#FFD700" />
-                    <Text style={styles.rating}> {item.rating} </Text>
+                    <Text style={styles.rating}> {item.rating !== undefined ? item.rating : '?'} </Text>
                   </View>
                   <Text style={styles.releaseDate}>{genres}</Text>
                 </View>

@@ -49,6 +49,7 @@ export const Login = () => {
             console.log('Backend response:', response.data);
 
             setUser(firebaseUser);
+            navigation.navigate('Home');
           } else {
             console.log('Error al autenticar con el backend:', response.statusText);
           }

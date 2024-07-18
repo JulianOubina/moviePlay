@@ -24,7 +24,7 @@ const LockScreenModal = ({ visible }: { visible: boolean }) => (
   >
     <View style={styles.lockScreen}>
       <Text style={styles.lockScreenText}>No internet connection</Text>
-      <ActivityIndicator size="large" color="#ffffff" />
+      <ActivityIndicator size="large" color="#E74C3C" />
         <Image
           source={require('../assets/images/noConnectionRobot.png')}
           style={styles.noConnectionImage}

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { getNewTokens } from '../../navigation/RefreshToken';
 
 type Movie = {
   idMovie: string;
@@ -54,7 +55,7 @@ function GenreScroll({genreTitle, handleMoviePress}: Props) {
       } catch (error: any) {
         switch (error.response.status) {
           case 403:
-            //await getNewTokens();
+            await getNewTokens();
             fetchMoviesGenres(pageParam);
             break;
           default:
@@ -67,7 +68,7 @@ function GenreScroll({genreTitle, handleMoviePress}: Props) {
   return (
     <View style={styles.flatListSection}>
       <Text style={styles.title}>{genreTitle}</Text>
-      {movies.length === 0 && <ProgressBarAndroid style={styles.progressBar} styleAttr="Horizontal" color="#ffffff" />        
+      {movies.length === 0 && <ProgressBarAndroid style={styles.progressBar} styleAttr="Horizontal" color="#E74C3C" />        
       }
       <FlatList
         data={movies}
