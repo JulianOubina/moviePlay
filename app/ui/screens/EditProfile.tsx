@@ -7,6 +7,8 @@ import axios from 'axios';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
 
 type EditProfileProp = RouteProp<RootStackParamList, "EditProfile">
 
@@ -275,3 +277,4 @@ const styles = StyleSheet.create({
 });
 
 export default EditProfile;
+

@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
-    zIndex: 1, // Asegura que el botón esté por encima del reproductor de video
+    zIndex: 1,
   },
   videoPlayer: {
     width: '100%',

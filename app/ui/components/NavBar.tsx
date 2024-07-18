@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   overlayText:{
     color: '#fff',

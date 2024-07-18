@@ -7,7 +7,6 @@ import { RootStackParamList } from '../../navigation/navigator';
 import { UserContext } from './Login';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BottomTabNavigator from '../../navigation/BottomTabNavigator';
 
 const Profile: React.FC = () => {
   const user = useContext(UserContext);

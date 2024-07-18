@@ -199,7 +199,6 @@ const SearchScreen = ({ route }: Props) => {
   }
 
   const handleFilterMovies = () => {
-    // hay que hacer una copia de la peliculas originales para no perderlas
     if(moviesCopy.length === 0){
       setMoviesCopy(movies);
     }
@@ -215,14 +214,11 @@ const SearchScreen = ({ route }: Props) => {
   };
 
   const applyFilters = () => {
-    console.log(selectedGenres);
     setMovies(moviesCopy.filter(movie => movie.genres.some(genre => selectedGenres.includes(genre))));
     setIsModalVisible(false);
   };
 
-  const clearFilters = () => {
-    console.log(moviesCopy.map(movie => movie.title));
-    
+  const clearFilters = () => {  
     setMovies(moviesCopy);
     setMoviesCopy([]);
     setIsModalVisible(false);

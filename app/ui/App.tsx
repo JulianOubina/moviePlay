@@ -6,7 +6,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { Login, UserContext } from '../ui/screens/Login';
 import Profile from '../ui/screens/Profile'; 
-import Home from './screens/Home';
 import EditProfile from './screens/EditProfile';
 import BottomTabNavigator from '../navigation/BottomTabNavigator';
 import SearchScreen from '../ui/screens/Search'; 

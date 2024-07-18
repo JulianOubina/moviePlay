@@ -556,7 +556,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     marginBottom: 20,
-    //marginVertical: 300,
   },
   backButton2: {
     alignSelf: 'flex-end',

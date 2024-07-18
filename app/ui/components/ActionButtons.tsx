@@ -56,9 +56,8 @@ const styles = StyleSheet.create({
     top: '100%',
   },
   container: {
-    height: 35, // Set the desired height
-    width: '100%', // Set the desired width
-    //backgroundColor: '#271D1D',
+    height: 35,
+    width: '100%', 
   },
   filterButton: {
     position: 'absolute',

@@ -48,6 +48,7 @@ function Home() {
   const [carrouselPhotos, setCarrouselPhotos] = React.useState<Carrousel[]>([]);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isFocused, setIsFocused] = React.useState(false);
+  const [numberRows, setNumberRows] = React.useState(3);
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -55,6 +56,10 @@ function Home() {
       setLoading(false);
     }, 4000);
   }, []);
+
+  React.useEffect(() => {
+
+  }, [numberRows])
 
   
   const fetchCarrousel = async () =>{
@@ -140,6 +145,14 @@ function Home() {
     setIsFocused(isFocusedParam);
   }
 
+  const handleScrollEnd = (event: { nativeEvent: { contentOffset: { y: number }, layoutMeasurement: { height: number }, contentSize: { height: number } } }) => {
+    const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
+    const isEndReached = contentOffset.y + layoutMeasurement.height >= contentSize.height;
+    if (isEndReached) {
+      setNumberRows(numberRows + 3);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <NavBar searchQueryInput={''} isFocused={isFocused} setIsFocused={handleFocus} />
@@ -151,7 +164,7 @@ function Home() {
       {loading ? (
         <ActivityIndicator style={styles.loadingIndicator} size="large" color="#0000ff" />
       ) : (
-        <ScrollView>
+        <ScrollView onScrollEndDrag={handleScrollEnd}>
           <View style={styles.carouselContainer}>
             <View style={styles.divider} />
             <FlatList
@@ -171,10 +184,9 @@ function Home() {
             />
             <View style={styles.divider} />
           </View>
-          
-          <GenreScroll genreTitle={sortedGenres[0]} handleMoviePress={handleMoviePress} />
-          <GenreScroll genreTitle={sortedGenres[1]} handleMoviePress={handleMoviePress} />
-          <GenreScroll genreTitle={sortedGenres[2]} handleMoviePress={handleMoviePress} />
+          {sortedGenres.slice(0, numberRows).map((genre, index) => (
+            <GenreScroll key={index} genreTitle={genre} handleMoviePress={handleMoviePress} />
+          ))}
         </ScrollView>
       )}
     </View>
