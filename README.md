@@ -36,6 +36,6 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
      1. En una nueva terminal, compilar y ejecutar la aplicación en el emulador:
         ```bash
-        npm react-native start
+        npx react-native start
         ```
 	Se abrira metro y se debera apretar la opcion "A"
